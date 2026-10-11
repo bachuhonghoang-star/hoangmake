@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>👑 ANH EM CCVC — MÃI ĐỈNH V8</title>
+<title>👑 ANH EM CCVC — MÃI ĐỈNH V9</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -125,6 +125,7 @@ input:checked+.slider:before{transform:translateX(22px);background:#fff}
 .ll.ws{color:#00bfff}
 .ll.global{color:var(--red);font-weight:900;background:rgba(255,0,64,.15);padding:2px 6px;border-radius:4px}
 .ll.recover{color:var(--green);font-weight:700}
+.ll.debug{color:var(--txt2);font-style:italic}
 .log-search{margin-bottom:10px;display:flex;gap:8px;align-items:center}
 .notif-stack{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:calc(100vw - 40px)}
 .notif{background:var(--card);border:2px solid var(--cyan);border-radius:14px;padding:14px 20px;font-weight:700;font-size:13px;box-shadow:0 0 35px rgba(0,255,255,.5),0 10px 40px rgba(0,0,0,.6);display:flex;align-items:center;gap:12px;animation:notifIn .4s cubic-bezier(.2,.9,.3,1.4);pointer-events:auto;min-width:280px;max-width:400px}
@@ -190,12 +191,13 @@ body.spamming .progress.active{animation:none !important}
       <div class="logo">👑</div>
       <div>
         <div class="htitle">ANH EM CCVC</div>
-        <div class="hsub">MÃI ĐỈNH · V8 ULTIMATE</div>
+        <div class="hsub">MÃI ĐỈNH · V9 iOS FIX</div>
       </div>
     </div>
     <button class="tbtn" id="theme-btn" onclick="toggleTheme()">🌙</button>
   </div>
 </div>
+
 <div class="card" style="animation-delay:.05s">
   <div class="ch"><span class="ci">🔑</span><span class="ct">KHO TOKEN</span><span class="bdg bdg-p">SECURE</span></div>
   <div id="token-container">
@@ -243,6 +245,7 @@ body.spamming .progress.active{animation:none !important}
   <div class="tr"><div class="tl"><span class="ic">⏸️</span><div>TOKEN PENALTY<span class="td">Token 429 → nghỉ tạm, không skip vĩnh viễn</span></div></div><label class="sw"><input type="checkbox" id="anti_penalty" checked><span class="slider"></span></label></div>
   <div class="tr"><div class="tl"><span class="ic">🌍</span><div>GLOBAL 429 DETECT<span class="td">Discord chặn toàn IP → nghỉ tất cả</span></div></div><label class="sw"><input type="checkbox" id="anti_global" checked><span class="slider"></span></label></div>
   <div class="tr"><div class="tl"><span class="ic">🎚️</span><div>AUTO-THROTTLE<span class="td">Tự giảm batch khi 429, tự phục hồi khi ổn</span></div></div><label class="sw"><input type="checkbox" id="anti_autothrottle" checked><span class="slider"></span></label></div>
+  <div class="tr"><div class="tl"><span class="ic">🧹</span><div>STRIP KÝ TỰ ẨN<span class="td">Tự lọc ký tự ẩn khi paste (iOS fix)</span></div></div><label class="sw"><input type="checkbox" id="anti_sanitize" checked><span class="slider"></span></label></div>
   <div class="tr"><div class="tl"><span class="ic">🔁</span><div>NETWORK RETRY<span class="td">Retry fetch khi lỗi mạng (2 lần)</span></div></div><label class="sw"><input type="checkbox" id="anti_retry" checked><span class="slider"></span></label></div>
 </div>
 
@@ -346,12 +349,13 @@ body.spamming .progress.active{animation:none !important}
     <input type="text" id="log-search" placeholder="🔍 Tìm trong log..." oninput="filterLog(this.value)" style="flex:1;padding:8px 12px;font-size:12px">
   </div>
   <div class="log" id="log">
-    <div class="ll info">> [SYSTEM] ANH EM CCVC — MÃI ĐỈNH khởi động...</div>
+    <div class="ll info">> [SYSTEM] ANH EM CCVC — V9 iOS FIX khởi động...</div>
     <div class="ll success">> [READY] Anti-ban core: ACTIVE</div>
     <div class="ll ws">> [READY] Gateway WebSocket: STANDBY</div>
     <div class="ll anti">> [READY] Turbo batch engine: STANDBY</div>
     <div class="ll global">> [READY] Global 429 detect: ARMED</div>
     <div class="ll recover">> [READY] Auto-throttle: 100% (cruise control on)</div>
+    <div class="ll debug">> [READY] Token sanitize: ON (iOS paste fix)</div>
   </div>
 </div>
 
@@ -408,6 +412,26 @@ const shuffle = (arr) => {
   return a;
 };
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* ⭐ iOS FIX: Strip ký tự ẩn mà iOS Safari tự chèn khi paste
+   - zero-width space/joiner (U+200B-U+200D, U+FEFF)
+   - non-breaking space (U+00A0, U+202F, U+2007, U+2060)
+   - smart quotes (U+2018-201F) và curly quotes
+   - leading/trailing quote và khoảng trắng
+   Áp dụng cho MỌI token trước khi gửi request. */
+function sanitizeToken(t) {
+  if (!t) return '';
+  if (document.getElementById('anti_sanitize')?.checked === false) {
+    return String(t).trim();
+  }
+  return String(t)
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/[\u00A0\u202F\u2007\u2060]/g, ' ')
+    .replace(/[\u2018\u2019\u201A\u201B\u201C\u201D\u201E\u201F]/g, '')
+    .replace(/^["'`\s]+/, '')
+    .replace(/["'`\s]+$/, '')
+    .trim();
+}
 
 function decodeUserId(token) {
   try {
@@ -700,23 +724,37 @@ function removeToken(btn) {
 }
 
 function saveTokens() {
-  const tks = Array.from(document.querySelectorAll('.token-input')).map(i => i.value.trim()).filter(v => v);
+  const tks = Array.from(document.querySelectorAll('.token-input'))
+    .map(i => sanitizeToken(i.value))
+    .filter(v => v);
   localStorage.setItem('ccvc_tks', JSON.stringify(tks));
   if (!tks.length) { showToast('Không có token để lưu!', 'warn'); return; }
   notif('success', '💾 ĐÃ LƯU', `${tks.length} token vào bộ nhớ`);
 }
 
 async function checkTokens() {
-  const tks = Array.from(document.querySelectorAll('.token-input')).map(i => i.value.trim()).filter(v => v);
+  const raw = Array.from(document.querySelectorAll('.token-input')).map(i => i.value);
+  const tks = raw.map(sanitizeToken).filter(v => v);
   if (!tks.length) { showToast('Chưa có token!', 'error'); return; }
   notif('info', '🔍 CHECK', `Đang kiểm tra ${tks.length} token...`);
   setProgress(0);
+
+  /* DEBUG: log độ dài token trước/sau khi sanitize */
+  raw.forEach((r, i) => {
+    if (!r) return;
+    const clean = sanitizeToken(r);
+    writeLog(`[DEBUG] raw len=${r.length} → clean len=${clean.length} (${clean.substring(0,15)}...${clean.slice(-10)})`, 'debug');
+  });
+
   let alive = 0, dead = 0, locked = 0;
   for (let i = 0; i < tks.length; i++) {
     const t = tks[i];
     setProgress(Math.round((i / tks.length) * 100));
     try {
-      const r = await fetch('https://discord.com/api/v9/users/@me', { headers: getHeaders(t) });
+      const r = await fetch('https://discord.com/api/v9/users/@me', {
+        headers: getHeaders(t),
+        cache: 'no-store'
+      });
       if (r.ok) {
         const u = await r.json();
         alive++;
@@ -743,7 +781,7 @@ function saveConfig() {
     if (el) localStorage.setItem('ccvc_' + f, el.value);
   });
   const antiKeys = ['anti_super_props','anti_gateway','anti_random_channel','anti_random_token',
-    'anti_age','anti_penalty','anti_global','anti_autothrottle','anti_retry',
+    'anti_age','anti_penalty','anti_global','anti_autothrottle','anti_sanitize','anti_retry',
     'no_repeat','reset_when_empty','tag_after'];
   antiKeys.forEach(k => {
     const el = document.getElementById(k);
@@ -753,7 +791,7 @@ function saveConfig() {
 }
 
 /* ═══════════════════════════════════════════════════
-   NETWORK — fetch retry
+   NETWORK — fetch retry + no-store cache
    ═══════════════════════════════════════════════════ */
 async function fetchWithRetry(url, opts, maxRetries = 2) {
   const useRetry = document.getElementById('anti_retry')?.checked;
@@ -761,7 +799,7 @@ async function fetchWithRetry(url, opts, maxRetries = 2) {
   let lastErr;
   for (let i = 0; i < tries; i++) {
     try {
-      return await fetch(url, opts);
+      return await fetch(url, { ...opts, cache: 'no-store' });
     } catch (e) {
       lastErr = e;
       if (i < tries - 1) await sleep(500 * Math.pow(2, i));
@@ -955,7 +993,7 @@ function closeAllGateways() {
   updateStats();
 }
 /* ═══════════════════════════════════════════════════
-   STATS UI — throttle 500ms
+   STATS UI
    ═══════════════════════════════════════════════════ */
 function animateNumber(el, to) {
   const from = parseInt(el.textContent) || 0;
@@ -983,8 +1021,6 @@ function updateStats() {
   const now = Date.now();
   speedWindow = speedWindow.filter(t => now - t < 10000);
   document.getElementById('stat-rate').textContent = (speedWindow.length / 10).toFixed(1);
-
-  /* AUTO-THROTTLE display */
   const th = document.getElementById('stat-throttle');
   if (th) {
     const pct = Math.round(globalThrottleFactor * 100);
@@ -994,12 +1030,10 @@ function updateStats() {
 }
 setInterval(updateStats, 500);
 
-/* Cập nhật msg-file-info mỗi 1s */
 setInterval(() => {
   if (fileMsgPool.length) updateMsgFileInfo();
 }, 1000);
 
-/* Flush log throttle động — turbo log ít hơn */
 setInterval(() => {
   const now = Date.now();
   const isTurbo = parseInt(document.getElementById('delay')?.value || 1000) <= 200;
@@ -1042,7 +1076,7 @@ async function sendMessage(token, channelId, cfg, nonceOut) {
 }
 
 /* ═══════════════════════════════════════════════════
-   FIRE ONE — có AUTO-THROTTLE logic
+   FIRE ONE
    ═══════════════════════════════════════════════════ */
 async function fireOne(token, channelId, cfg, state, short) {
   if (!isRunning || skippedTokens.has(token)) return;
@@ -1056,7 +1090,6 @@ async function fireOne(token, channelId, cfg, state, short) {
       speedWindow.push(Date.now());
       pendingOkCount++;
       goodStreak++;
-      /* AUTO-RECOVER: sau 200 tin OK → tăng throttle 10% */
       if (goodStreak >= 200 && globalThrottleFactor < 1.0) {
         globalThrottleFactor = Math.min(1.0, globalThrottleFactor * 1.1);
         goodStreak = 0;
@@ -1085,7 +1118,6 @@ async function fireOne(token, channelId, cfg, state, short) {
       if (isGlobal && useGlobal) {
         globalPenaltyUntil = Math.max(globalPenaltyUntil, Date.now() + wait);
         globalCount++;
-        /* AUTO-THROTTLE: giảm 25% */
         if (useAuto) {
           globalThrottleFactor = Math.max(0.2, globalThrottleFactor * 0.75);
         }
@@ -1122,7 +1154,7 @@ async function fireOne(token, channelId, cfg, state, short) {
 }
 
 /* ═══════════════════════════════════════════════════
-   WORKER — có auto-throttle batch
+   WORKER
    ═══════════════════════════════════════════════════ */
 async function runTokenWorker(token, cfg) {
   const state = tokenStates.get(token);
@@ -1146,7 +1178,6 @@ async function runTokenWorker(token, cfg) {
   const turbo = cfg.baseDelay <= 200;
   const userBatchSize = Math.max(1, Math.min(100, cfg.batchSize || 8));
   const useAuto = document.getElementById('anti_autothrottle')?.checked;
-  /* Diversity: mỗi token có offset riêng để không đồng bộ hóa */
   const tokenOffset = stableHash(short) % 5;
 
   while (isRunning) {
@@ -1165,7 +1196,6 @@ async function runTokenWorker(token, cfg) {
     const chs = cfg.antiRandomChannel ? shuffle(cfg.chs) : cfg.chs;
 
     if (turbo) {
-      /* AUTO-THROTTLE: batch size thực = batch * factor */
       const effectiveBatch = useAuto
         ? Math.max(2, Math.floor(userBatchSize * globalThrottleFactor))
         : userBatchSize;
@@ -1179,7 +1209,6 @@ async function runTokenWorker(token, cfg) {
         const batch = chs.slice(i, i + effectiveBatch);
         promises.push(Promise.all(batch.map(ch => fireOne(token, ch, cfg, state, short))));
 
-        /* Diversity delay theo token */
         await sleep(rand(1, 3) + tokenOffset);
       }
       await Promise.all(promises);
@@ -1208,11 +1237,19 @@ async function runTokenWorker(token, cfg) {
 async function start(mode = 'text') {
   if (isRunning) { notif('warn', '⚠️ ĐANG CHẠY', 'Tool đang chạy, dừng trước!'); return; }
 
-  const tks = Array.from(document.querySelectorAll('.token-input')).map(i => i.value.trim()).filter(v => v);
+  const raw = Array.from(document.querySelectorAll('.token-input')).map(i => i.value);
+  const tks = raw.map(sanitizeToken).filter(v => v);
   const chs = document.getElementById('channels').value.split('\n').map(v => v.trim()).filter(v => v);
 
   if (!tks.length) { notif('error', '❌ THIẾU TOKEN', 'Chưa có token!'); showToast('Chưa có token!', 'error'); return; }
   if (!chs.length) { notif('error', '❌ THIẾU CHANNEL', 'Chưa có channel ID!'); showToast('Chưa có channel!', 'error'); return; }
+
+  /* DEBUG: log token len trước/sau sanitize */
+  raw.forEach(r => {
+    if (!r) return;
+    const clean = sanitizeToken(r);
+    writeLog(`[DEBUG] raw=${r.length} clean=${clean.length} head="${clean.substring(0,12)}" tail="${clean.slice(-8)}"`, 'debug');
+  });
 
   isRunning = true;
   sentCount = 0; failCount = 0; skipCount = 0;
@@ -1289,7 +1326,7 @@ function stop() {
 }
 
 /* ═══════════════════════════════════════════════════
-   KEYBOARD SHORTCUTS
+   KEYBOARD
    ═══════════════════════════════════════════════════ */
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); start('text'); }
@@ -1303,7 +1340,7 @@ document.addEventListener('keydown', (e) => {
    ═══════════════════════════════════════════════════ */
 async function fetchBuildNumber() {
   try {
-    const res = await fetch('https://discord.com/login', { mode:'cors' });
+    const res = await fetch('https://discord.com/login', { mode:'cors', cache:'no-store' });
     const html = await res.text();
     const m = html.match(/buildNumber["\s:]+([0-9]{6})/);
     if (m) { buildNumber = parseInt(m[1]); writeLog(`[BUILD] #${buildNumber}`, 'info'); }
@@ -1337,7 +1374,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   const antiKeys = ['anti_super_props','anti_gateway','anti_random_channel','anti_random_token',
-    'anti_age','anti_penalty','anti_global','anti_autothrottle','anti_retry',
+    'anti_age','anti_penalty','anti_global','anti_autothrottle','anti_sanitize','anti_retry',
     'no_repeat','reset_when_empty','tag_after'];
   antiKeys.forEach(k => {
     const el = document.getElementById(k);
@@ -1353,9 +1390,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await fetchBuildNumber();
 
-  notif('success', '👑 ANH EM CCVC', `MÃI ĐỈNH · ${tks.length} token · build #${buildNumber}`, 4500);
-  writeLog(`[BOOT] ANH EM CCVC — MÃI ĐỈNH · ${tks.length} token · build #${buildNumber}`, 'success');
-  writeLog('[HINT] Ctrl+Enter: SPAM · Esc: DỪNG · Ctrl+S: LƯU', 'info');
+  notif('success', '👑 ANH EM CCVC V9', `MÃI ĐỈNH · ${tks.length} token · build #${buildNumber}`, 4500);
+  writeLog(`[BOOT] ANH EM CCVC V9 iOS FIX · ${tks.length} token · build #${buildNumber}`, 'success');
+  writeLog('[HINT] Ctrl+Enter: SPAM · Esc: DỪNG · Token sẽ tự strip ký tự ẩn iOS', 'info');
 });
 </script>
 </body>
