@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>👑 ANH EM CCVC — MÃI ĐỈNH V9</title>
+<title>👑 ANH EM CCVC — V11 MAI ĐỈNH</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -96,12 +96,15 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:#666;transition:.35s;border-radius:50%}
 input:checked+.slider{background:linear-gradient(135deg,var(--cyan),var(--purple));border-color:var(--cyan);box-shadow:0 0 18px rgba(0,255,255,.6)}
 input:checked+.slider:before{transform:translateX(22px);background:#fff}
-.speed-btn{padding:14px 8px;border-radius:12px;border:2px solid var(--border);background:var(--input);color:var(--txt2);font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .3s;text-transform:uppercase;letter-spacing:1px;text-align:center}
-.speed-btn:hover{border-color:var(--cyan);color:var(--cyan)}
-.speed-btn.active{background:linear-gradient(135deg,var(--cyan),var(--purple));border-color:var(--cyan);color:#000;box-shadow:0 0 30px rgba(0,255,255,.6);transform:scale(1.03)}
-.speed-btn.active.turbo{background:linear-gradient(135deg,var(--red),var(--orange));border-color:var(--red);box-shadow:0 0 30px rgba(255,0,64,.7);animation:turboPulse 1s ease-in-out infinite}
+.preset-btn{padding:16px 10px;border-radius:14px;border:2px solid var(--border);background:var(--input);color:var(--txt2);font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .3s;text-transform:uppercase;letter-spacing:1px;text-align:center;line-height:1.3}
+.preset-btn:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-2px)}
+.preset-btn.active{border-color:var(--cyan);color:#000;box-shadow:0 0 30px rgba(0,255,255,.6);transform:scale(1.03)}
+.preset-btn[data-preset="stealth"].active{background:linear-gradient(135deg,var(--blue),var(--cyan))}
+.preset-btn[data-preset="balanced"].active{background:linear-gradient(135deg,var(--green),var(--cyan))}
+.preset-btn[data-preset="aggressive"].active{background:linear-gradient(135deg,var(--gold),var(--orange));border-color:var(--orange);box-shadow:0 0 30px rgba(255,165,0,.6)}
+.preset-btn[data-preset="turbo"].active{background:linear-gradient(135deg,var(--red),var(--orange));border-color:var(--red);box-shadow:0 0 30px rgba(255,0,64,.7);animation:turboPulse 1s ease-in-out infinite}
 @keyframes turboPulse{0%,100%{box-shadow:0 0 30px rgba(255,0,64,.7)}50%{box-shadow:0 0 50px rgba(255,0,64,1)}}
-.speed-btn .sub{display:block;font-size:9px;opacity:.75;margin-top:3px;letter-spacing:0}
+.preset-btn .sub{display:block;font-size:9px;opacity:.75;margin-top:4px;letter-spacing:0;font-weight:600}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
 .stat{background:var(--input);border-radius:12px;padding:14px 8px;text-align:center;border:1px solid var(--border);transition:all .35s}
 .stat:hover{border-color:var(--cyan);box-shadow:0 0 25px rgba(0,255,255,.3);transform:translateY(-3px)}
@@ -126,6 +129,7 @@ input:checked+.slider:before{transform:translateX(22px);background:#fff}
 .ll.global{color:var(--red);font-weight:900;background:rgba(255,0,64,.15);padding:2px 6px;border-radius:4px}
 .ll.recover{color:var(--green);font-weight:700}
 .ll.debug{color:var(--txt2);font-style:italic}
+.ll.typing{color:var(--pink)}
 .log-search{margin-bottom:10px;display:flex;gap:8px;align-items:center}
 .notif-stack{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:calc(100vw - 40px)}
 .notif{background:var(--card);border:2px solid var(--cyan);border-radius:14px;padding:14px 20px;font-weight:700;font-size:13px;box-shadow:0 0 35px rgba(0,255,255,.5),0 10px 40px rgba(0,0,0,.6);display:flex;align-items:center;gap:12px;animation:notifIn .4s cubic-bezier(.2,.9,.3,1.4);pointer-events:auto;min-width:280px;max-width:400px}
@@ -159,6 +163,8 @@ input:checked+.slider:before{transform:translateX(22px);background:#fff}
 @keyframes progressShine{0%{background-position:0 50%}100%{background-position:200% 50%}}
 .msg-info{margin-top:10px;font-size:12px;color:var(--cyan);text-align:center;font-family:'JetBrains Mono',monospace}
 .msg-info.warn{color:var(--gold)}
+.warn-banner{background:linear-gradient(135deg,rgba(255,0,64,.15),rgba(255,102,0,.15));border:1px solid var(--red);border-radius:12px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:var(--red);font-weight:700;display:none;letter-spacing:.5px}
+.warn-banner.show{display:block;animation:cardEntry .3s}
 body.spamming .scan,
 body.spamming .particles,
 body.spamming::after,
@@ -171,9 +177,8 @@ body.spamming .logo,
 body.spamming .logo::after,
 body.spamming .hsub,
 body.spamming .htitle{animation:none !important}
-body.spamming .speed-btn.active.turbo{animation:none !important}
+body.spamming .preset-btn.active.turbo{animation:none !important}
 body.spamming .sd.active{animation:none !important}
-body.spamming .notif::before{animation:none !important}
 body.spamming .progress.active{animation:none !important}
 </style>
 </head>
@@ -182,7 +187,6 @@ body.spamming .progress.active{animation:none !important}
 <div class="scan"></div>
 <div class="particles" id="particles"></div>
 <div class="notif-stack" id="notif-stack"></div>
-
 <div class="app">
 
 <div class="header">
@@ -191,12 +195,14 @@ body.spamming .progress.active{animation:none !important}
       <div class="logo">👑</div>
       <div>
         <div class="htitle">ANH EM CCVC</div>
-        <div class="hsub">MÃI ĐỈNH · V9 iOS FIX</div>
+        <div class="hsub">MÃI ĐỈNH · V11 PROXY-READY</div>
       </div>
     </div>
     <button class="tbtn" id="theme-btn" onclick="toggleTheme()">🌙</button>
   </div>
 </div>
+
+<div class="warn-banner" id="warn-banner"></div>
 
 <div class="card" style="animation-delay:.05s">
   <div class="ch"><span class="ci">🔑</span><span class="ct">KHO TOKEN</span><span class="bdg bdg-p">SECURE</span></div>
@@ -214,46 +220,109 @@ body.spamming .progress.active{animation:none !important}
 </div>
 
 <div class="card" style="animation-delay:.1s">
-  <div class="ch"><span class="ci">⚡</span><span class="ct">TỐC ĐỘ GỬI</span><span class="bdg bdg-ok" id="speed-badge">BALANCED</span></div>
+  <div class="ch"><span class="ci">🎯</span><span class="ct">CHIẾN LƯỢC</span><span class="bdg bdg-ok" id="preset-badge">BALANCED</span></div>
   <div class="g4" style="margin-bottom:14px">
-    <button class="speed-btn" id="speed-safe" onclick="setSpeed(2000)">🛡️ SAFE<span class="sub">2000ms</span></button>
-    <button class="speed-btn" id="speed-normal" onclick="setSpeed(1000)">⚡ NORMAL<span class="sub">1000ms</span></button>
-    <button class="speed-btn" id="speed-fast" onclick="setSpeed(500)">🔥 FAST<span class="sub">500ms</span></button>
-    <button class="speed-btn turbo" id="speed-turbo" onclick="setSpeed(50)">⚡⚡ TURBO<span class="sub">50ms</span></button>
+    <button class="preset-btn" data-preset="stealth" onclick="setPreset('stealth')">
+      🐢 STEALTH<span class="sub">3000ms · batch 3<br>sống tuần-tháng</span>
+    </button>
+    <button class="preset-btn active" data-preset="balanced" onclick="setPreset('balanced')">
+      ⚡ BALANCED<span class="sub">1200ms · batch 6<br>sống ngày-tuần</span>
+    </button>
+    <button class="preset-btn" data-preset="aggressive" onclick="setPreset('aggressive')">
+      🔥 AGGRESSIVE<span class="sub">300ms · batch 12<br>sống giờ-ngày</span>
+    </button>
+    <button class="preset-btn" data-preset="turbo" onclick="setPreset('turbo')">
+      ☠️ TURBO LIỀU<span class="sub">30ms · batch 30<br>sống phút-giờ</span>
+    </button>
   </div>
-  <div class="tr">
-    <div class="tl"><span class="ic">⏱️</span><div>DELAY TÙY CHỈNH (MS)<span class="td">Dưới 200ms = tự bật turbo batch mode</span></div></div>
-    <input type="number" id="delay" value="1000" min="20" style="width:110px;padding:7px 11px;font-size:14px;text-align:center">
+  <div class="g3">
+    <div class="fg">
+      <label>DELAY (MS)</label>
+      <input type="number" id="delay" value="1200" min="10" oninput="markCustom()">
+    </div>
+    <div class="fg">
+      <label>BATCH SIZE</label>
+      <input type="number" id="batch_size" value="6" min="1" max="100" oninput="markCustom()">
+    </div>
+    <div class="fg">
+      <label>MAX TIN/GIỜ/TOKEN</label>
+      <input type="number" id="burst_limit" value="0" min="0">
+    </div>
   </div>
-  <div class="g2" style="margin-top:10px">
-    <div class="fg" style="margin-bottom:0"><label>MAX TIN/GIỜ/TOKEN (0=∞)</label><input type="number" id="burst_limit" value="0" min="0"></div>
-    <div class="fg" style="margin-bottom:0"><label>DELAY KHI 429 (MS)</label><input type="number" id="retry_429" value="3000" min="500"></div>
+  <div class="g3" style="margin-top:6px">
+    <div class="fg">
+      <label>RETRY 429 (MS)</label>
+      <input type="number" id="retry_429" value="3000" min="500">
+    </div>
+    <div class="fg">
+      <label>AGE MIN (NGÀY)</label>
+      <input type="number" id="min_age" value="0" min="0">
+    </div>
+    <div class="fg">
+      <label>CHANNEL COOLDOWN (S)</label>
+      <input type="number" id="ch_cooldown" value="3" min="0">
+    </div>
+  </div>
+  <div class="g2" style="margin-top:6px">
+    <div class="fg" style="margin-bottom:0">
+      <label>AUTO-CYCLE: CHẠY (PHÚT)</label>
+      <input type="number" id="cycle_run" value="15" min="1">
+    </div>
+    <div class="fg" style="margin-bottom:0">
+      <label>AUTO-CYCLE: NGHỈ (PHÚT)</label>
+      <input type="number" id="cycle_rest" value="3" min="0">
+    </div>
   </div>
   <div class="tr" style="margin-top:10px">
-    <div class="tl"><span class="ic">📦</span><div>BATCH SIZE<span class="td">Số channel gửi song song (6-10 an toàn, 20-50 siêu nhanh)</span></div></div>
-    <input type="number" id="batch_size" value="20" min="1" max="100" style="width:80px;padding:7px 11px;font-size:14px;text-align:center">
+    <div class="tl"><span class="ic">🔄</span><div>AUTO-CYCLE<span class="td">Chạy X phút nghỉ Y phút, lặp lại</span></div></div>
+    <label class="sw"><input type="checkbox" id="auto_cycle" checked><span class="slider"></span></label>
+  </div>
+  <div class="tr">
+    <div class="tl"><span class="ic">🎚️</span><div>AUTO-THROTTLE<span class="td">Tự giảm khi 429, tự tăng khi ổn</span></div></div>
+    <label class="sw"><input type="checkbox" id="auto_throttle" checked><span class="slider"></span></label>
   </div>
 </div>
 
 <div class="card" style="animation-delay:.15s">
-  <div class="ch"><span class="ci">🛡️</span><span class="ct">CHỐNG BAN CỐT LÕI</span><span class="bdg bdg-p">CORE + AUTO</span></div>
-  <div class="tr"><div class="tl"><span class="ic">🎭</span><div>SUPER PROPERTIES FULL<span class="td">Fake Discord client props khớp device profile</span></div></div><label class="sw"><input type="checkbox" id="anti_super_props" checked><span class="slider"></span></label></div>
-  <div class="tr"><div class="tl"><span class="ic">🌐</span><div>GATEWAY WEBSOCKET<span class="td">Token online như thật</span></div></div><label class="sw"><input type="checkbox" id="anti_gateway" checked><span class="slider"></span></label></div>
-  <div class="tr"><div class="tl"><span class="ic">🔄</span><div>RANDOM CHANNEL ORDER<span class="td">Không spam 1 channel liên tục</span></div></div><label class="sw"><input type="checkbox" id="anti_random_channel" checked><span class="slider"></span></label></div>
-  <div class="tr"><div class="tl"><span class="ic">🔀</span><div>RANDOM TOKEN ORDER<span class="td">Đảo thứ tự token mỗi vòng</span></div></div><label class="sw"><input type="checkbox" id="anti_random_token" checked><span class="slider"></span></label></div>
-  <div class="tr"><div class="tl"><span class="ic">📅</span><div>AGE CHECK<span class="td">Bỏ qua token mới tạo dưới N ngày</span></div></div><label class="sw"><input type="checkbox" id="anti_age" checked><span class="slider"></span></label></div>
-  <div class="tr"><div class="tl"><span class="ic">⏸️</span><div>TOKEN PENALTY<span class="td">Token 429 → nghỉ tạm, không skip vĩnh viễn</span></div></div><label class="sw"><input type="checkbox" id="anti_penalty" checked><span class="slider"></span></label></div>
+  <div class="ch"><span class="ci">🌐</span><span class="ct">PROXY (TÙY CHỌN)</span><span class="bdg bdg-warn">OPTIONAL</span></div>
+  <div class="fg">
+    <label>DANH SÁCH PROXY (MỖI DÒNG 1 — TRỐNG = IP GỐC)</label>
+    <textarea id="proxies" rows="3" placeholder="http://user:pass@ip:port&#10;socks5://ip:port&#10;http://ip:port"></textarea>
+  </div>
+  <div class="tr">
+    <div class="tl"><span class="ic">📌</span><div>STICKY PER TOKEN<span class="td">Mỗi token gắn 1 proxy cố định</span></div></div>
+    <label class="sw"><input type="checkbox" id="proxy_sticky" checked><span class="slider"></span></label>
+  </div>
+  <div class="msg-info" id="proxy-info">Không proxy = 1 IP gánh tất cả. Đi chậm là cách duy nhất sống lâu.</div>
+</div>
+<div class="card" style="animation-delay:.2s">
+  <div class="ch"><span class="ci">🛡️</span><span class="ct">CHỐNG BAN CỐT LÕI</span><span class="bdg bdg-p">CORE</span></div>
+  <div class="tr"><div class="tl"><span class="ic">🎭</span><div>SUPER PROPERTIES<span class="td">Fake Discord client props per-token</span></div></div><label class="sw"><input type="checkbox" id="anti_super_props" checked><span class="slider"></span></label></div>
   <div class="tr"><div class="tl"><span class="ic">🌍</span><div>GLOBAL 429 DETECT<span class="td">Discord chặn toàn IP → nghỉ tất cả</span></div></div><label class="sw"><input type="checkbox" id="anti_global" checked><span class="slider"></span></label></div>
-  <div class="tr"><div class="tl"><span class="ic">🎚️</span><div>AUTO-THROTTLE<span class="td">Tự giảm batch khi 429, tự phục hồi khi ổn</span></div></div><label class="sw"><input type="checkbox" id="anti_autothrottle" checked><span class="slider"></span></label></div>
-  <div class="tr"><div class="tl"><span class="ic">🧹</span><div>STRIP KÝ TỰ ẨN<span class="td">Tự lọc ký tự ẩn khi paste (iOS fix)</span></div></div><label class="sw"><input type="checkbox" id="anti_sanitize" checked><span class="slider"></span></label></div>
-  <div class="tr"><div class="tl"><span class="ic">🔁</span><div>NETWORK RETRY<span class="td">Retry fetch khi lỗi mạng (2 lần)</span></div></div><label class="sw"><input type="checkbox" id="anti_retry" checked><span class="slider"></span></label></div>
+  <div class="tr"><div class="tl"><span class="ic">⏸️</span><div>TOKEN PENALTY<span class="td">Token 429 → nghỉ riêng, không skip</span></div></div><label class="sw"><input type="checkbox" id="anti_penalty" checked><span class="slider"></span></label></div>
+  <div class="tr"><div class="tl"><span class="ic">📅</span><div>AGE CHECK<span class="td">Bỏ qua token mới tạo dưới N ngày</span></div></div><label class="sw"><input type="checkbox" id="anti_age" checked><span class="slider"></span></label></div>
+  <div class="tr"><div class="tl"><span class="ic">📊</span><div>PROACTIVE RATE-LIMIT<span class="td">Đọc header Discord → chờ trước khi bị đập</span></div></div><label class="sw"><input type="checkbox" id="anti_proactive" checked><span class="slider"></span></label></div>
+  <div class="tr"><div class="tl"><span class="ic">🎲</span><div>JITTER MỌI NƠI<span class="td">Delay/batch/order random nhẹ</span></div></div><label class="sw"><input type="checkbox" id="anti_jitter" checked><span class="slider"></span></label></div>
+  <div class="tr"><div class="tl"><span class="ic">🧹</span><div>SANITIZE TOKEN<span class="td">Lọc ký tự ẩn khi paste</span></div></div><label class="sw"><input type="checkbox" id="anti_sanitize" checked><span class="slider"></span></label></div>
+  <div class="tr"><div class="tl"><span class="ic">🔁</span><div>NETWORK RETRY<span class="td">Retry 2 lần khi lỗi mạng</span></div></div><label class="sw"><input type="checkbox" id="anti_retry" checked><span class="slider"></span></label></div>
 </div>
 
-<div class="card" style="animation-delay:.2s">
-  <div class="ch"><span class="ci">📢</span><span class="ct">MỤC TIÊU & CẤU HÌNH</span></div>
+<div class="card" style="animation-delay:.25s">
+  <div class="ch"><span class="ci">⌨️</span><span class="ct">FAKE GÕ</span><span class="bdg bdg-p" id="typing-badge">SHORT</span></div>
+  <div class="g4" style="margin-bottom:14px">
+    <button class="preset-btn" id="typing-off" onclick="setTyping('off')">OFF<span class="sub">gửi thẳng</span></button>
+    <button class="preset-btn" id="typing-short" onclick="setTyping('short')">SHORT<span class="sub">300-1200ms</span></button>
+    <button class="preset-btn active" id="typing-realistic" onclick="setTyping('realistic')">REALISTIC<span class="sub">theo độ dài tin</span></button>
+    <button class="preset-btn" id="typing-mixed" onclick="setTyping('mixed')">MIXED<span class="sub">random 2 mode</span></button>
+  </div>
+  <div class="msg-info">REALISTIC mô phỏng tốc độ gõ người 4-7 ký tự/giây · tin 100 ký tự ≈ 15-20s</div>
+</div>
+
+<div class="card" style="animation-delay:.3s">
+  <div class="ch"><span class="ci">📢</span><span class="ct">MỤC TIÊU & NỘI DUNG</span></div>
   <div class="fg">
-    <label>ID CHANNELS (MỖI DÒNG 1 ID — CÀNG NHIỀU CHANNEL CÀNG NHANH)</label>
-    <textarea id="channels" rows="4" placeholder="123456789012345678&#10;987654321098765432&#10;111222333444555666"></textarea>
+    <label>ID CHANNELS (MỖI DÒNG 1)</label>
+    <textarea id="channels" rows="4" placeholder="123456789012345678&#10;987654321098765432"></textarea>
   </div>
   <div class="g3">
     <div class="fg">
@@ -269,28 +338,22 @@ body.spamming .progress.active{animation:none !important}
       <input type="text" id="tag_id" placeholder="User ID...">
     </div>
     <div class="fg">
-      <label>AGE MIN (NGÀY)</label>
-      <input type="number" id="min_age" value="0" min="0" placeholder="0 = tắt">
+      <label>VỊ TRÍ TAG</label>
+      <select id="tag_pos">
+        <option value="after" selected>Sau câu</option>
+        <option value="before">Trước câu</option>
+      </select>
     </div>
   </div>
-  <div class="tr" style="margin-top:6px">
-    <div class="tl"><span class="ic">📍</span><div>TAG SAU CÂU<span class="td">TẮT: tag trước câu · BẬT: tag sau câu</span></div></div>
-    <label class="sw"><input type="checkbox" id="tag_after" checked><span class="slider"></span></label>
-  </div>
-  <button class="btn bo bsm" style="margin-top:10px" onclick="saveConfig()">⚙️ LƯU CẤU HÌNH</button>
-</div>
-
-<div class="card" style="animation-delay:.25s">
-  <div class="ch"><span class="ci">💬</span><span class="ct">VŨ KHÍ TẤN CÔNG</span></div>
   <div class="fg">
     <label>NỘI DUNG (MỖI DÒNG 1 BIẾN THỂ)</label>
-    <textarea id="msg" rows="3" placeholder="Xin chào anh em&#10;Hello mọi người&#10;Chào buổi tối"></textarea>
+    <textarea id="msg" rows="3" placeholder="Xin chào anh em&#10;Hello mọi người"></textarea>
   </div>
   <div class="fg">
     <label>📂 UPLOAD FILE CÂU (.TXT / .CSV / .JSON)</label>
     <div class="fw">
       <input type="file" id="file_msg" accept=".txt,.csv,.json,text/plain" onchange="loadMsgFile(event)">
-      <div class="fl"><span>📂</span> CHỌN FILE CÂU TỪ ĐIỆN THOẠI...</div>
+      <div class="fl"><span>📂</span> CHỌN FILE CÂU...</div>
     </div>
     <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn bo bsm" style="flex:1" onclick="clearMsgFile()">🗑️ XÓA FILE</button>
@@ -298,47 +361,51 @@ body.spamming .progress.active{animation:none !important}
     </div>
     <div class="msg-info" id="msg-file-info"></div>
   </div>
-  <div class="tr" style="margin-top:12px">
-    <div class="tl"><span class="ic">🎲</span><div>KHÔNG TRÙNG CÂU<span class="td">Mỗi câu chỉ dùng 1 lần / session</span></div></div>
+  <div class="tr">
+    <div class="tl"><span class="ic">#️⃣</span><div>THÊM "#" TRƯỚC CÂU</div></div>
+    <label class="sw"><input type="checkbox" id="prefix_hash"><span class="slider"></span></label>
+  </div>
+  <div class="tr">
+    <div class="tl"><span class="ic">🎲</span><div>KHÔNG TRÙNG CÂU<span class="td">Mỗi câu dùng 1 lần / session</span></div></div>
     <label class="sw"><input type="checkbox" id="no_repeat" checked><span class="slider"></span></label>
   </div>
   <div class="tr">
-    <div class="tl"><span class="ic">🔁</span><div>RESET KHI HẾT<span class="td">Hết câu → tự reset dùng lại từ đầu</span></div></div>
+    <div class="tl"><span class="ic">🔁</span><div>RESET KHI HẾT<span class="td">Hết câu → dùng lại từ đầu</span></div></div>
     <label class="sw"><input type="checkbox" id="reset_when_empty" checked><span class="slider"></span></label>
   </div>
 </div>
 
-<div class="card" style="animation-delay:.3s">
+<div class="card" style="animation-delay:.35s">
   <div class="ch">
     <span class="ci">🚀</span>
     <span class="ct">BẢNG ĐIỀU KHIỂN</span>
     <span class="sd" id="status-dot" style="margin-left:auto"></span>
   </div>
   <div class="g2" style="margin-bottom:12px">
-    <button class="btn bsu" onclick="start('text')">🚀 SPAM</button>
+    <button class="btn bsu" onclick="start()">🚀 SPAM</button>
     <button class="btn bda" onclick="stop()">🛑 DỪNG</button>
   </div>
   <div class="stats">
     <div class="stat"><div class="sv success" id="stat-sent">0</div><div class="sl">Đã Gửi</div></div>
     <div class="stat"><div class="sv danger" id="stat-fail">0</div><div class="sl">Lỗi</div></div>
     <div class="stat"><div class="sv purple" id="stat-skip">0</div><div class="sl">Skip</div></div>
-    <div class="stat"><div class="sv gold" id="stat-rate">0</div><div class="sl">Tin/Giây</div></div>
+    <div class="stat"><div class="sv gold" id="stat-rate">0.0</div><div class="sl">Tin/Giây</div></div>
   </div>
-  <div class="stats" style="margin-top:10px">
-    <div class="stat"><div class="sv blue" id="stat-ws">0</div><div class="sl">WS Online</div></div>
+  <div class="stats">
     <div class="stat"><div class="sv gold" id="stat-429">0</div><div class="sl">429</div></div>
     <div class="stat"><div class="sv purple" id="stat-age">0</div><div class="sl">Skip Age</div></div>
     <div class="stat"><div class="sv" id="stat-penalty">0</div><div class="sl">Penalty</div></div>
+    <div class="stat"><div class="sv blue" id="stat-throttle" style="font-size:16px">100%</div><div class="sl">Throttle</div></div>
   </div>
-  <div class="stats" style="margin-top:10px">
-    <div class="stat" style="grid-column:span 4">
-      <div class="sv" id="stat-throttle" style="font-size:16px;color:var(--green)">100%</div>
-      <div class="sl">AUTO-THROTTLE · TỰ GIẢM KHI 429 · TỰ TĂNG KHI ỔN</div>
-    </div>
+  <div class="stats">
+    <div class="stat"><div class="sv blue" id="stat-concurrent" style="font-size:16px">0</div><div class="sl">Concurrent</div></div>
+    <div class="stat"><div class="sv" id="stat-typing" style="font-size:16px">0</div><div class="sl">Typing</div></div>
+    <div class="stat"><div class="sv" id="stat-cycle" style="font-size:16px;color:var(--green)">RUN</div><div class="sl">Cycle</div></div>
+    <div class="stat"><div class="sv" id="stat-uptime" style="font-size:16px">0s</div><div class="sl">Uptime</div></div>
   </div>
 </div>
 
-<div class="card" style="animation-delay:.35s">
+<div class="card" style="animation-delay:.4s">
   <div class="ch">
     <span class="ci">📋</span>
     <span class="ct">TERMINAL LOG</span>
@@ -349,60 +416,81 @@ body.spamming .progress.active{animation:none !important}
     <input type="text" id="log-search" placeholder="🔍 Tìm trong log..." oninput="filterLog(this.value)" style="flex:1;padding:8px 12px;font-size:12px">
   </div>
   <div class="log" id="log">
-    <div class="ll info">> [SYSTEM] ANH EM CCVC — V9 iOS FIX khởi động...</div>
+    <div class="ll info">> [SYSTEM] ANH EM CCVC — V11 khởi động...</div>
     <div class="ll success">> [READY] Anti-ban core: ACTIVE</div>
-    <div class="ll ws">> [READY] Gateway WebSocket: STANDBY</div>
-    <div class="ll anti">> [READY] Turbo batch engine: STANDBY</div>
+    <div class="ll anti">> [READY] Super properties per-token: ARMED</div>
     <div class="ll global">> [READY] Global 429 detect: ARMED</div>
     <div class="ll recover">> [READY] Auto-throttle: 100% (cruise control on)</div>
-    <div class="ll debug">> [READY] Token sanitize: ON (iOS paste fix)</div>
+    <div class="ll typing">> [READY] Fake typing: SHORT mode</div>
+    <div class="ll info">> [READY] Proactive rate-limit: ARMED</div>
+    <div class="ll info">> [READY] Pipeline engine: STANDBY</div>
   </div>
 </div>
 
 </div>
-
-<div class="toast" id="toast"></div>
-
 <script>
 'use strict';
 
-/* ═══════════════════════════════════════════════════
+/* ============================================================
    STATE
-   ═══════════════════════════════════════════════════ */
+   ============================================================ */
 let isRunning = false;
+let stopRequested = false;
 let sentCount = 0, failCount = 0, skipCount = 0;
-let rlCount = 0, ageSkipped = 0, penaltyCount = 0, globalCount = 0;
+let rlCount = 0, ageSkipped = 0, penaltyCount = 0, typingCount = 0;
 let speedWindow = [];
-let wsConnections = new Map();
 let logsArchive = [];
 let buildNumber = 360150;
 let audioCtx = null;
 let startTime = 0;
+let cycleResting = false;
+
 let tokenStates = new Map();
 let skippedTokens = new Set();
 let globalPenaltyUntil = 0;
 
-/* AUTO-THROTTLE */
+/* Throttle */
 let globalThrottleFactor = 1.0;
-let lastGlobalHit = 0;
 let goodStreak = 0;
+let goodStreakStart = 0;
 
-/* LOG THROTTLE */
-let lastLogTime = 0;
-let pendingOkCount = 0;
-let pendingErrCount = 0;
-let uiThrottleMs = 500;
-let turboLogMs = 1500;
+/* Rate-limit buckets */
+let rateBuckets = new Map();
 
-/* FILE MSG POOL */
+/* Semaphore */
+let activeRequests = 0;
+let MAX_CONCURRENT = 40;
+
+/* Channel cooldown */
+let channelCooldown = new Map();
+
+/* Message pool */
 let fileMsgPool = [];
 let fileMsgUsed = new Set();
 let fileMsgSource = '';
+let msgQueue = [];
 
-/* ═══════════════════════════════════════════════════
+/* Proxy */
+let proxyList = [];
+let proxyAssign = new Map();
+let proxyIndex = 0;
+
+/* Typing mode */
+let typingMode = 'short';
+
+/* Log throttle */
+let lastLogTime = 0;
+let pendingOkCount = 0;
+let pendingErrCount = 0;
+let lastMilestoneNotif = 0;
+const UI_THROTTLE_MS = 500;
+
+/* ============================================================
    UTILS
-   ═══════════════════════════════════════════════════ */
+   ============================================================ */
 const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const randFloat = (min, max) => Math.random() * (max - min) + min;
+
 const shuffle = (arr) => {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -411,19 +499,18 @@ const shuffle = (arr) => {
   }
   return a;
 };
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-/* ⭐ iOS FIX: Strip ký tự ẩn mà iOS Safari tự chèn khi paste
-   - zero-width space/joiner (U+200B-U+200D, U+FEFF)
-   - non-breaking space (U+00A0, U+202F, U+2007, U+2060)
-   - smart quotes (U+2018-201F) và curly quotes
-   - leading/trailing quote và khoảng trắng
-   Áp dụng cho MỌI token trước khi gửi request. */
+const sleep = (ms) => new Promise(r => setTimeout(r, Math.max(0, ms)));
+
+function stableHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
 function sanitizeToken(t) {
   if (!t) return '';
-  if (document.getElementById('anti_sanitize')?.checked === false) {
-    return String(t).trim();
-  }
+  if (document.getElementById('anti_sanitize')?.checked === false) return String(t).trim();
   return String(t)
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
     .replace(/[\u00A0\u202F\u2007\u2060]/g, ' ')
@@ -446,77 +533,125 @@ function getTokenAge(token) {
   try {
     const uid = decodeUserId(token);
     if (!uid) return null;
-    const created = (Number(BigInt(uid) >> 22n) + 1420070400000) / 1000;
-    return (Date.now() / 1000 - created) / 86400;
+    const shifted = BigInt(uid) >> 22n;
+    const created = Number(shifted) + 1420070400000;
+    return (Date.now() - created) / 86400000;
   } catch { return null; }
 }
 
-/* ═══════════════════════════════════════════════════
-   FINGERPRINT MANAGER
-   ═══════════════════════════════════════════════════ */
+/* ============================================================
+   FINGERPRINT — per-token device_id từ localStorage seed
+   ============================================================ */
 const UA_POOL = [
-  { ua:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', browser:'Chrome', version:'131.0.0.0', major:'131', os:'Windows', osVer:'10', platform:'"Windows"', mobile:'?0' },
-  { ua:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36', browser:'Chrome', version:'124.0.0.0', major:'124', os:'Windows', osVer:'10', platform:'"Windows"', mobile:'?0' },
-  { ua:'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', browser:'Chrome', version:'131.0.0.0', major:'131', os:'Mac OS X', osVer:'10.15.7', platform:'"macOS"', mobile:'?0' },
-  { ua:'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0', browser:'Firefox', version:'133.0', major:'133', os:'Windows', osVer:'10', platform:'"Windows"', mobile:'?0' },
-  { ua:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36', browser:'Chrome', version:'130.0.0.0', major:'130', os:'Windows', osVer:'10', platform:'"Windows"', mobile:'?0' },
-  { ua:'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15', browser:'Safari', version:'17.6', major:'17', os:'Mac OS X', osVer:'10.15.7', platform:'"macOS"', mobile:'?0' }
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 OPR/116.0.0.0',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0'
 ];
-const TIMEZONES = ['Asia/Ho_Chi_Minh','Asia/Bangkok','Asia/Singapore','Asia/Tokyo','America/New_York','Europe/London','Europe/Berlin'];
-const LOCALES = ['en-US','en-GB','vi-VN','ja-JP','de-DE'];
+const TIMEZONES = ['Asia/Ho_Chi_Minh','Asia/Bangkok','Asia/Singapore','Asia/Tokyo','Asia/Hong_Kong','Asia/Seoul','America/New_York','America/Los_Angeles','America/Chicago','Europe/London','Europe/Berlin','Europe/Paris','Australia/Sydney'];
+const LOCALES = ['en-US','en-GB','vi-VN','ja-JP','de-DE','fr-FR','ko-KR','th-TH','zh-CN'];
 
-function stableHash(str) {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
-  return Math.abs(h);
+function parseUA(ua) {
+  const out = { ua, browser:'Chrome', version:'131.0.0.0', major:'131', os:'Windows', osVer:'10', platform:'"Windows"', mobile:'?0' };
+  if (/Firefox\/([\d.]+)/.test(ua)) { out.browser='Firefox'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
+  else if (/Edg\/([\d.]+)/.test(ua)) { out.browser='Edge'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
+  else if (/OPR\/([\d.]+)/.test(ua)) { out.browser='Opera'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
+  else if (/Chrome\/([\d.]+)/.test(ua)) { out.browser='Chrome'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
+  else if (/Version\/([\d.]+).*Safari/.test(ua)) { out.browser='Safari'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
+  if (/Windows NT 10/.test(ua)) { out.os='Windows'; out.osVer='10'; out.platform='"Windows"'; }
+  else if (/Mac OS X/.test(ua)) { out.os='Mac OS X'; out.osVer='10.15.7'; out.platform='"macOS"'; }
+  else if (/Linux/.test(ua)) { out.os='Linux'; out.osVer=''; out.platform='"Linux"'; out.mobile='?0'; }
+  return out;
 }
 
-function getDeviceProfile(token) {
-  const h = stableHash(token);
-  const ua = UA_POOL[h % UA_POOL.length];
-  const tz = TIMEZONES[(h >> 3) % TIMEZONES.length];
-  const locale = LOCALES[(h >> 5) % LOCALES.length];
-  return {
-    ua: ua.ua, browser: ua.browser, version: ua.version, major: ua.major,
-    os: ua.os, osVer: ua.osVer, platform: ua.platform, mobile: ua.mobile,
-    timezone: tz, locale,
-    hardwareConcurrency: [4,8,12,16][(h>>9)%4],
-    deviceMemory: [4,8,16][(h>>11)%3],
-    deviceId: h.toString(16).padStart(16,'0').slice(0,16)
-  };
+function getDeviceSeed(token) {
+  const key = 'ccvc_dev_' + stableHash(token).toString(36);
+  let seed = localStorage.getItem(key);
+  if (!seed) {
+    seed = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem(key, seed);
+  }
+  return seed;
 }
 
 const _profileCache = new Map();
 function getProfile(token) {
-  if (!_profileCache.has(token)) _profileCache.set(token, getDeviceProfile(token));
-  return _profileCache.get(token);
+  if (_profileCache.has(token)) return _profileCache.get(token);
+  const seed = getDeviceSeed(token);
+  const h = stableHash(seed);
+  const uaStr = UA_POOL[h % UA_POOL.length];
+  const p = parseUA(uaStr);
+  const tz = TIMEZONES[(h >> 3) % TIMEZONES.length];
+  const locale = LOCALES[(h >> 5) % LOCALES.length];
+  const profile = { ...p, timezone: tz, locale };
+  _profileCache.set(token, profile);
+  return profile;
 }
 
+const _superPropsCache = new Map();
 function getSuperProps(token) {
+  if (_superPropsCache.has(token)) return _superPropsCache.get(token);
   const p = getProfile(token);
-  return btoa(JSON.stringify({
-    os: p.os, browser: p.browser, device: '',
+  const sp = btoa(JSON.stringify({
+    os: p.os,
+    browser: p.browser,
+    device: '',
     system_locale: p.locale,
-    browser_user_agent: p.ua, browser_version: p.version,
+    browser_user_agent: p.ua,
+    browser_version: p.version,
     os_version: p.osVer,
-    referrer: '', referring_domain: '', referring_domain_current: '',
+    referrer: '',
+    referring_domain: '',
+    referring_domain_current: '',
     release_channel: 'stable',
     client_build_number: buildNumber,
     client_event_source: null,
     client_version: p.version,
     native_build_number: null
   }));
+  _superPropsCache.set(token, sp);
+  return sp;
 }
 
+const _headerCache = new Map();
 function getHeaders(token) {
+  if (_headerCache.has(token)) return _headerCache.get(token);
   const p = getProfile(token);
   const h = {
     'Authorization': token,
     'User-Agent': p.ua,
     'Accept': '*/*',
     'Accept-Language': `${p.locale},en;q=0.9`,
+    'Accept-Encoding': 'gzip, deflate, br',
     'X-Discord-Locale': p.locale,
-    'X-Debug-Options': 'bugReporterEnabled'
+    'X-Debug-Options': 'bugReporterEnabled',
+    'Origin': 'https://discord.com',
+    'Referer': 'https://discord.com/channels/@me',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'Priority': 'u=1, i',
+    'Content-Type': 'application/json'
   };
   if (document.getElementById('anti_super_props')?.checked) {
     h['X-Super-Properties'] = getSuperProps(token);
@@ -524,76 +659,648 @@ function getHeaders(token) {
     h['sec-ch-ua-mobile'] = p.mobile;
     h['sec-ch-ua-platform'] = p.platform;
   }
+  _headerCache.set(token, h);
   return h;
 }
 
-/* ═══════════════════════════════════════════════════
-   AUDIO
-   ═══════════════════════════════════════════════════ */
-function initAudio() {
-  if (!audioCtx) {
-    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
-  }
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+function clearFingerprintCaches() {
+  _profileCache.clear();
+  _superPropsCache.clear();
+  _headerCache.clear();
 }
 
-function playBeep(type) {
-  if (!audioCtx) return;
+/* ============================================================
+   PROXY
+   ============================================================ */
+function parseProxies() {
+  const raw = document.getElementById('proxies').value.split('\n').map(s => s.trim()).filter(s => s);
+  proxyList = raw;
+  proxyAssign.clear();
+  proxyIndex = 0;
+  const info = document.getElementById('proxy-info');
+  if (proxyList.length === 0) {
+    info.textContent = 'Không proxy = 1 IP gánh tất cả. Đi chậm là cách duy nhất sống lâu.';
+    info.classList.add('warn');
+  } else {
+    info.textContent = `Đã nạp ${proxyList.length} proxy · sticky=${document.getElementById('proxy_sticky')?.checked ? 'ON' : 'OFF'}`;
+    info.classList.remove('warn');
+  }
+}
+
+function getProxyFor(token) {
+  if (!proxyList.length) return null;
+  if (document.getElementById('proxy_sticky')?.checked) {
+    if (!proxyAssign.has(token)) {
+      proxyAssign.set(token, proxyList[proxyIndex % proxyList.length]);
+      proxyIndex++;
+    }
+    return proxyAssign.get(token);
+  }
+  return proxyList[proxyIndex++ % proxyList.length];
+}
+
+/* ============================================================
+   NETWORK
+   ============================================================ */
+async function fetchJSON(url, opts, token, maxRetries = 2) {
+  const useRetry = document.getElementById('anti_retry')?.checked;
+  const tries = useRetry ? maxRetries : 1;
+  let lastErr;
+  for (let i = 0; i < tries; i++) {
+    try {
+      return await fetch(url, { ...opts, cache: 'no-store', credentials: 'omit' });
+    } catch (e) {
+      lastErr = e;
+      if (i < tries - 1) await sleep(400 * (i + 1));
+    }
+  }
+  throw lastErr;
+}
+
+async function fetchWithRetry(url, opts, maxRetries = 2) {
+  return fetchJSON(url, opts, null, maxRetries);
+}
+/* ============================================================
+   RATE-LIMIT BUCKET — dùng header thật từ Discord
+   ============================================================ */
+function updateRateBucket(token, channelId, res) {
+  const useProactive = document.getElementById('anti_proactive')?.checked;
+  if (!useProactive) return;
+  const bucketId = res.headers.get('x-ratelimit-bucket') || (token + '|' + channelId);
+  const remaining = res.headers.get('x-ratelimit-remaining');
+  const resetAfter = res.headers.get('x-ratelimit-reset-after');
+  if (remaining === null || resetAfter === null) return;
+  rateBuckets.set(bucketId, {
+    remaining: parseInt(remaining, 10),
+    resetAt: Date.now() + parseFloat(resetAfter) * 1000,
+    token, channelId
+  });
+}
+
+async function waitRateBucket(token, channelId) {
+  const useProactive = document.getElementById('anti_proactive')?.checked;
+  if (!useProactive) return;
+  // Check all buckets for this token+channel
+  for (const [bid, b] of rateBuckets.entries()) {
+    if (b.token === token && b.channelId === channelId) {
+      if (b.remaining <= 0 && b.resetAt > Date.now()) {
+        const waitMs = b.resetAt - Date.now() + rand(30, 120);
+        if (waitMs > 0 && waitMs < 8000) await sleep(waitMs);
+      }
+    }
+  }
+}
+
+/* ============================================================
+   SEMAPHORE — không leak, không spin break
+   ============================================================ */
+async function acquireSlot() {
+  while (activeRequests >= MAX_CONCURRENT) {
+    await sleep(5);
+    if (stopRequested || !isRunning) throw new Error('stopped');
+  }
+  activeRequests++;
+}
+
+function releaseSlot() {
+  activeRequests = Math.max(0, activeRequests - 1);
+}
+
+/* ============================================================
+   CHANNEL COOLDOWN
+   ============================================================ */
+function canHitChannel(token, channelId) {
+  const cd = parseInt(document.getElementById('ch_cooldown').value) || 0;
+  if (cd <= 0) return true;
+  const key = token + '|' + channelId;
+  const last = channelCooldown.get(key) || 0;
+  return Date.now() - last >= cd * 1000;
+}
+
+function markChannelHit(token, channelId) {
+  channelCooldown.set(token + '|' + channelId, Date.now());
+}
+
+/* ============================================================
+   MESSAGE PICKER — reservation queue
+   ============================================================ */
+function loadMsgFile(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let raw = String(reader.result || '');
+    let lines = [];
+    const name = (f.name || '').toLowerCase();
+
+    if (name.endsWith('.json')) {
+      try {
+        const j = JSON.parse(raw);
+        if (Array.isArray(j)) lines = j.map(x => String(x));
+        else if (j && typeof j === 'object') lines = Object.values(j).map(x => String(x));
+      } catch {
+        notif('error', '📂 FILE LỖI', 'JSON không hợp lệ');
+        return;
+      }
+    } else {
+      lines = raw.split(/\r?\n/);
+      if (lines.length === 1 && lines[0].includes(',')) lines = lines[0].split(',');
+    }
+    lines = lines.map(x => String(x).trim()).filter(x => x.length > 0);
+    const unique = [...new Set(lines)];
+    if (!unique.length) { notif('error', '📂 FILE RỖNG', 'Không có câu'); return; }
+    fileMsgPool = unique;
+    fileMsgUsed.clear();
+    fileMsgSource = f.name;
+    updateMsgFileInfo();
+    const dupes = lines.length - unique.length;
+    notif('success', '📂 ĐÃ NẠP', `${unique.length} câu${dupes ? ` (loại ${dupes} trùng)` : ''}`, 4000);
+    writeLog(`[FILE] Nạp ${unique.length} câu từ "${f.name}"`, 'success');
+  };
+  reader.readAsText(f, 'utf-8');
+}
+
+function clearMsgFile() {
+  fileMsgPool = [];
+  fileMsgUsed.clear();
+  fileMsgSource = '';
+  const inp = document.getElementById('file_msg');
+  if (inp) inp.value = '';
+  updateMsgFileInfo();
+  notif('info', '📂 FILE', 'Đã xóa');
+}
+
+function updateMsgFileInfo() {
+  const el = document.getElementById('msg-file-info');
+  if (!el) return;
+  if (!fileMsgPool.length) { el.textContent = ''; el.classList.remove('warn'); return; }
+  const used = fileMsgUsed.size, total = fileMsgPool.length;
+  el.innerHTML = `📂 <b>${fileMsgSource}</b> · dùng ${used}/${total} · còn ${total - used}`;
+  el.classList.toggle('warn', total - used === 0);
+}
+
+function showMsgStats() {
+  if (!fileMsgPool.length) { notif('warn', '📊', 'Chưa có file câu'); return; }
+  notif('info', '📊 THỐNG KÊ', `Tổng: ${fileMsgPool.length} · Dùng: ${fileMsgUsed.size} · Còn: ${fileMsgPool.length - fileMsgUsed.size}`, 4000);
+}
+
+function buildMsgQueue(count) {
+  msgQueue = [];
+  const txt = document.getElementById('msg').value;
+  const noRepeat = document.getElementById('no_repeat')?.checked;
+  const resetWhenEmpty = document.getElementById('reset_when_empty')?.checked;
+
+  const sourcePool = fileMsgPool.length
+    ? fileMsgPool
+    : txt.split('\n').map(s => s.trim()).filter(s => s);
+
+  if (!sourcePool.length) return;
+
+  if (!noRepeat) {
+    for (let i = 0; i < count; i++) msgQueue.push(sourcePool[rand(0, sourcePool.length - 1)]);
+    return;
+  }
+
+  // no repeat: cần count câu khác nhau
+  let available = [];
+  if (fileMsgPool.length) {
+    for (let i = 0; i < sourcePool.length; i++) {
+      if (!fileMsgUsed.has(i)) available.push(i);
+    }
+    if (available.length < count && resetWhenEmpty) {
+      fileMsgUsed.clear();
+      available = Array.from({ length: sourcePool.length }, (_, i) => i);
+    }
+    available = shuffle(available);
+    const pickCount = Math.min(count, available.length);
+    for (let i = 0; i < pickCount; i++) {
+      fileMsgUsed.add(available[i]);
+      msgQueue.push(sourcePool[available[i]]);
+    }
+    // Nếu vẫn thiếu → fill random không trùng
+    while (msgQueue.length < count) {
+      msgQueue.push(sourcePool[rand(0, sourcePool.length - 1)]);
+    }
+  } else {
+    const idx = shuffle(Array.from({ length: sourcePool.length }, (_, i) => i));
+    for (let i = 0; i < count; i++) msgQueue.push(sourcePool[idx[i % sourcePool.length]]);
+  }
+}
+
+function nextMsg() {
+  if (msgQueue.length) return msgQueue.pop();
+  const txt = document.getElementById('msg').value;
+  const pool = fileMsgPool.length ? fileMsgPool : txt.split('\n').map(s => s.trim()).filter(s => s);
+  return pool.length ? pool[rand(0, pool.length - 1)] : '';
+}
+
+/* ============================================================
+   TYPING FAKE
+   ============================================================ */
+function setTyping(mode) {
+  typingMode = mode;
+  document.querySelectorAll('[id^="typing-"]').forEach(el => el.classList.remove('active'));
+  const btn = document.getElementById('typing-' + mode);
+  if (btn) btn.classList.add('active');
+  const badge = document.getElementById('typing-badge');
+  if (badge) badge.textContent = mode.toUpperCase();
+  localStorage.setItem('ccvc_typing', mode);
+  writeLog(`[TYPING] Mode: ${mode.toUpperCase()}`, 'typing');
+}
+
+async function sendTyping(token, channelId) {
   try {
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    const freq = type === 'error' ? 300 : type === 'warn' ? 500 : type === 'success' ? 900 : 700;
-    o.frequency.value = freq;
-    o.type = 'sine';
-    g.gain.value = 0.03;
-    o.start();
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-    o.stop(audioCtx.currentTime + 0.12);
+    const proxy = getProxyFor(token);
+    if (proxy) return; // proxy fetch cần native, tạm skip trong browser
+    await fetch(`https://discord.com/api/v10/channels/${channelId}/typing`, {
+      method: 'POST',
+      headers: getHeaders(token),
+      cache: 'no-store',
+      credentials: 'omit'
+    });
+    typingCount++;
   } catch {}
 }
 
-/* ═══════════════════════════════════════════════════
-   NOTIFICATIONS
-   ═══════════════════════════════════════════════════ */
-function notif(type, title, text, duration = 3000) {
-  const stack = document.getElementById('notif-stack');
-  if (!stack) return;
-  const icons = { success:'✅', error:'❌', info:'ℹ️', warn:'⚠️' };
-  const el = document.createElement('div');
-  el.className = 'notif ' + type;
-  el.innerHTML = `<div class="notif-icon">${icons[type]||'ℹ️'}</div>
-    <div class="notif-body">
-      <div class="notif-title">${title}</div>
-      <div class="notif-text">${text}</div>
-    </div>`;
-  stack.appendChild(el);
-  setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, duration);
-  playBeep(type);
+async function fakeTypeDelay(token, channelId, content, mode) {
+  if (mode === 'off') return;
+  const actual = mode === 'mixed'
+    ? (Math.random() < 0.5 ? 'short' : 'realistic')
+    : mode;
+
+  await sendTyping(token, channelId);
+
+  if (actual === 'short') {
+    await sleep(rand(300, 1200));
+    return;
+  }
+
+  // realistic
+  const cps = randFloat(4, 7);
+  const baseMs = (content.length / cps) * 1000;
+  const jittered = baseMs * randFloat(0.8, 1.3);
+  const totalMs = Math.max(800, Math.min(20000, jittered));
+  const start = Date.now();
+  while (Date.now() - start < totalMs) {
+    if (!isRunning || stopRequested) return;
+    const remaining = totalMs - (Date.now() - start);
+    if (remaining > 8000) {
+      await sleep(8000);
+      await sendTyping(token, channelId);
+    } else {
+      await sleep(remaining);
+    }
+  }
 }
 
-function showToast(message, type = 'info') {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  const icons = { success:'✅', error:'❌', info:'ℹ️', warn:'⚠️' };
-  t.innerHTML = `<span style="font-size:22px">${icons[type]||'ℹ️'}</span> ${message}`;
-  t.style.borderColor = type === 'error' ? 'var(--red)'
-    : type === 'warn' ? 'var(--gold)'
-    : type === 'success' ? 'var(--green)' : 'var(--cyan)';
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+/* ============================================================
+   PRESET
+   ============================================================ */
+const PRESETS = {
+  stealth:    { delay: 3000, batch: 3,  typing: 'realistic', cycle_run: 10, cycle_rest: 5 },
+  balanced:   { delay: 1200, batch: 6,  typing: 'short',     cycle_run: 15, cycle_rest: 3 },
+  aggressive: { delay: 300,  batch: 12, typing: 'short',     cycle_run: 30, cycle_rest: 5 },
+  turbo:      { delay: 30,   batch: 30, typing: 'off',       cycle_run: 45, cycle_rest: 5 }
+};
+
+function setPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+  document.getElementById('delay').value = p.delay;
+  document.getElementById('batch_size').value = p.batch;
+  document.getElementById('cycle_run').value = p.cycle_run;
+  document.getElementById('cycle_rest').value = p.cycle_rest;
+  setTyping(p.typing);
+
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`.preset-btn[data-preset="${name}"]`);
+  if (btn) btn.classList.add('active');
+
+  const badge = document.getElementById('preset-badge');
+  badge.textContent = name.toUpperCase();
+  badge.className = 'bdg ' + (name === 'turbo' ? 'bdg-err' : name === 'aggressive' ? 'bdg-warn' : name === 'stealth' ? 'bdg-p' : 'bdg-ok');
+
+  localStorage.setItem('ccvc_preset', name);
+  showWarningBanner(name);
+  writeLog(`[PRESET] ${name.toUpperCase()} · ${p.delay}ms · batch ${p.batch}`, 'info');
 }
 
-/* ═══════════════════════════════════════════════════
+function markCustom() {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  const badge = document.getElementById('preset-badge');
+  badge.textContent = 'CUSTOM';
+  badge.className = 'bdg bdg-warn';
+  showWarningBanner('custom');
+}
+
+function showWarningBanner(preset) {
+  const el = document.getElementById('warn-banner');
+  const hasProxy = proxyList.length > 0;
+  let msg = '';
+  if (preset === 'turbo') {
+    msg = '☠️ TURBO LIỀU — không proxy + turbo = chết nhanh. Token sẽ bay trong phút-giờ. Anh đã được cảnh báo.';
+  } else if (preset === 'aggressive' && !hasProxy) {
+    msg = '🔥 AGGRESSIVE — sống giờ-ngày nếu không proxy. Cân nhắc dùng BALANCED hoặc STEALTH.';
+  } else if (preset === 'custom') {
+    const d = parseInt(document.getElementById('delay').value) || 0;
+    if (d < 500 && !hasProxy) msg = '⚠️ Delay < 500ms + không proxy = rủi ro cao.';
+  }
+  if (msg) { el.textContent = msg; el.classList.add('show'); }
+  else el.classList.remove('show');
+}
+/* ============================================================
+   FIRE ONE — gửi 1 tin
+   ============================================================ */
+async function fireOne(token, channelId, cfg, state, short) {
+  if (!isRunning || stopRequested || skippedTokens.has(token)) return;
+
+  // Channel cooldown
+  if (!canHitChannel(token, channelId)) {
+    skipCount++;
+    return;
+  }
+
+  // Proactive rate-limit wait
+  await waitRateBucket(token, channelId);
+
+  // Semaphore acquire
+  try { await acquireSlot(); } catch { return; }
+
+  try {
+    // Build content
+    let baseMsg = nextMsg();
+    if (!baseMsg) { releaseSlot(); return; }
+
+    let content = baseMsg;
+    if (document.getElementById('prefix_hash')?.checked) content = '# ' + content;
+
+    const tagMode = document.getElementById('tag_mode').value;
+    const tagId = document.getElementById('tag_id').value.trim();
+    const tagPos = document.getElementById('tag_pos').value;
+    const tagAfter = tagPos === 'after';
+
+    if (tagMode === 'everyone') {
+      content = tagAfter ? `${content} @everyone` : `@everyone ${content}`;
+    } else if (tagMode === 'user' && tagId) {
+      content = tagAfter ? `${content} <@${tagId}>` : `<@${tagId}> ${content}`;
+    }
+
+    // Fake typing
+    await fakeTypeDelay(token, channelId, content, typingMode);
+    if (!isRunning || stopRequested) { releaseSlot(); return; }
+
+    // Nonce
+    const nonce = (BigInt(Date.now()) << 22n | BigInt(rand(0, 4194303))).toString();
+
+    const body = JSON.stringify({ content, nonce, tts: false });
+
+    const res = await fetchWithRetry(
+      `https://discord.com/api/v10/channels/${channelId}/messages`,
+      { method: 'POST', headers: getHeaders(token), body },
+      2
+    );
+
+    markChannelHit(token, channelId);
+    updateRateBucket(token, channelId, res);
+
+    if (res.ok) {
+      sentCount++;
+      state.sentCount++;
+      state.msgInHour.push(Date.now());
+      speedWindow.push(Date.now());
+      pendingOkCount++;
+      goodStreak++;
+
+      // Recover throttle chậm — 300 tin + 60s
+      const now = Date.now();
+      if (!goodStreakStart) goodStreakStart = now;
+      if (goodStreak >= 300 && (now - goodStreakStart) >= 60000 && globalThrottleFactor < 1.0) {
+        globalThrottleFactor = Math.min(1.0, globalThrottleFactor + 0.05);
+        goodStreak = 0;
+        goodStreakStart = now;
+        writeLog(`[RECOVER] Throttle → ${Math.round(globalThrottleFactor * 100)}%`, 'recover');
+      }
+
+      if (Date.now() - lastLogTime > UI_THROTTLE_MS || pendingOkCount >= 25) flushOkLog();
+      const nowMs = Date.now();
+      if (sentCount % 1000 === 0 && nowMs - lastMilestoneNotif > 30000) {
+        notif('success', '🎉 MILESTONE', `Đã gửi ${sentCount} tin!`, 3000);
+        lastMilestoneNotif = nowMs;
+      }
+    } else if (res.status === 429) {
+      rlCount++;
+      let wait = parseInt(document.getElementById('retry_429').value) || 3000;
+      let isGlobal = false;
+      try {
+        const d = await res.json();
+        if (d.retry_after) wait = Math.ceil(d.retry_after * 1000) + 500;
+        if (d.global === true) isGlobal = true;
+      } catch {}
+      const gh = res.headers.get('x-ratelimit-global');
+      if (gh === 'true') isGlobal = true;
+
+      const useGlobal = document.getElementById('anti_global')?.checked;
+      const useAuto = document.getElementById('auto_throttle')?.checked;
+
+      if (isGlobal && useGlobal) {
+        globalPenaltyUntil = Math.max(globalPenaltyUntil, Date.now() + wait);
+        if (useAuto) globalThrottleFactor = 0.3;
+        goodStreak = 0;
+        writeLog(`[GLOBAL] 429 · throttle → 30%`, 'global');
+        notif('error', '🌍 GLOBAL RATE', `Nghỉ ${Math.round(wait / 1000)}s`, 3500);
+      } else if (document.getElementById('anti_penalty')?.checked) {
+        state.penalty = Date.now() + wait;
+        penaltyCount++;
+        if (useAuto) globalThrottleFactor = Math.max(0.35, globalThrottleFactor * 0.9);
+        goodStreak = 0;
+      } else {
+        skippedTokens.add(token);
+        skipCount++;
+      }
+    } else if (res.status === 401 || res.status === 403) {
+      failCount++;
+      skippedTokens.add(token);
+      writeLog(`[DEAD] ${short}... (${res.status})`, 'error');
+      notif('error', '💀 TOKEN DIE', `${short}... (${res.status})`, 3000);
+    } else {
+      failCount++;
+      pendingErrCount++;
+      let bodyTxt = '';
+      try { bodyTxt = (await res.text()).substring(0, 200); } catch {}
+      writeLog(`[HTTP ${res.status}] tk=${short} ch=${channelId.slice(0, 8)} | ${bodyTxt}`, 'error');
+    }
+  } catch (e) {
+    if (e.message === 'stopped') { releaseSlot(); return; }
+    failCount++;
+    pendingErrCount++;
+    writeLog(`[NET] tk=${short} ch=${channelId.slice(0, 8)} | ${e.message}`, 'error');
+  } finally {
+    releaseSlot();
+  }
+}
+
+/* ============================================================
+   WORKER per token
+   ============================================================ */
+async function runTokenWorker(token, cfg) {
+  const state = tokenStates.get(token);
+  const short = token.slice(0, 10);
+
+  if (cfg.antiAge && cfg.minAge > 0) {
+    const age = getTokenAge(token);
+    if (age !== null && age < cfg.minAge) {
+      ageSkipped++;
+      updateStats();
+      writeLog(`[AGE] ${short}... tuổi ${age.toFixed(0)}d < ${cfg.minAge}d → SKIP`, 'warn');
+      return;
+    }
+  }
+
+  const useAuto = document.getElementById('auto_throttle')?.checked;
+
+  while (isRunning && !stopRequested) {
+    if (skippedTokens.has(token)) return;
+    if (globalPenaltyUntil > Date.now()) { await sleep(300); continue; }
+    if (state.penalty > Date.now()) { await sleep(200); continue; }
+
+    const now = Date.now();
+    state.msgInHour = state.msgInHour.filter(t => now - t < 3600000);
+    if (cfg.burstLimit > 0 && state.msgInHour.length >= cfg.burstLimit) {
+      writeLog(`[LIMIT] ${short}... đạt ${cfg.burstLimit} tin/h, nghỉ 30s`, 'warn');
+      await sleep(30000);
+      continue;
+    }
+
+    const chs = cfg.chs.slice();
+    const batchSize = useAuto
+      ? Math.max(2, Math.floor(cfg.batchSize * globalThrottleFactor))
+      : cfg.batchSize;
+
+    // Round-robin qua channels với jitter
+    const order = shuffle(chs);
+    const jobs = [];
+
+    for (let i = 0; i < order.length && isRunning && !stopRequested; i++) {
+      if (globalPenaltyUntil > Date.now()) break;
+      if (state.penalty > Date.now()) break;
+
+      // Tạo batch nhỏ
+      const batch = order.slice(i, i + batchSize);
+      i += batch.length - 1;
+
+      for (const ch of batch) {
+        jobs.push(fireOne(token, ch, cfg, state, short));
+      }
+
+      // Delay giữa các batch
+      const base = cfg.baseDelay;
+      const jit = document.getElementById('anti_jitter')?.checked
+        ? base * randFloat(0.85, 1.2)
+        : base;
+      await sleep(Math.max(20, jit));
+    }
+
+    // Chờ hết batch hiện tại trước khi vòng mới
+    await Promise.allSettled(jobs);
+
+    if (!isRunning || stopRequested) break;
+    // Vòng nghỉ nhỏ
+    await sleep(rand(50, 250));
+  }
+}
+
+/* ============================================================
+   THROTTLE AUTO
+   ============================================================ */
+function updateThrottleUI() {
+  const el = document.getElementById('stat-throttle');
+  if (!el) return;
+  const pct = Math.round(globalThrottleFactor * 100);
+  el.textContent = pct + '%';
+  el.style.color = pct >= 90 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : 'var(--red)';
+  MAX_CONCURRENT = Math.max(4, Math.floor(40 * globalThrottleFactor));
+}
+
+/* ============================================================
+   AUTO-CYCLE — chạy X phút nghỉ Y phút
+   ============================================================ */
+async function cycleManager() {
+  const enabled = document.getElementById('auto_cycle')?.checked;
+  if (!enabled) return;
+  while (isRunning && !stopRequested) {
+    const runMin = parseInt(document.getElementById('cycle_run').value) || 15;
+    await sleep(runMin * 60 * 1000);
+    if (!isRunning || stopRequested) return;
+    const restMin = parseInt(document.getElementById('cycle_rest').value) || 0;
+    if (restMin <= 0) continue;
+    cycleResting = true;
+    document.getElementById('stat-cycle').textContent = 'REST';
+    document.getElementById('stat-cycle').style.color = 'var(--gold)';
+    writeLog(`[CYCLE] Nghỉ ${restMin} phút...`, 'warn');
+    notif('info', '😴 CYCLE', `Nghỉ ${restMin} phút`, 3000);
+    await sleep(restMin * 60 * 1000);
+    cycleResting = false;
+    document.getElementById('stat-cycle').textContent = 'RUN';
+    document.getElementById('stat-cycle').style.color = 'var(--green)';
+    writeLog(`[CYCLE] Tiếp tục chạy`, 'success');
+  }
+}
+
+/* ============================================================
+   STATS UI
+   ============================================================ */
+function animateNumber(el, to) {
+  const from = parseInt(el.textContent) || 0;
+  if (from === to) return;
+  const dur = 250;
+  const start = performance.now();
+  const ease = (p) => 1 - Math.pow(1 - p, 3);
+  const step = (t) => {
+    const p = Math.min(1, (t - start) / dur);
+    el.textContent = Math.floor(from + (to - from) * ease(p));
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = to;
+  };
+  requestAnimationFrame(step);
+}
+
+function updateStats() {
+  animateNumber(document.getElementById('stat-sent'), sentCount);
+  animateNumber(document.getElementById('stat-fail'), failCount);
+  animateNumber(document.getElementById('stat-skip'), skipCount);
+  animateNumber(document.getElementById('stat-429'), rlCount);
+  animateNumber(document.getElementById('stat-age'), ageSkipped);
+  animateNumber(document.getElementById('stat-penalty'), penaltyCount);
+  animateNumber(document.getElementById('stat-typing'), typingCount);
+  document.getElementById('stat-concurrent').textContent = activeRequests;
+  const now = Date.now();
+  speedWindow = speedWindow.filter(t => now - t < 10000);
+  document.getElementById('stat-rate').textContent = (speedWindow.length / 10).toFixed(1);
+  updateThrottleUI();
+  if (startTime) {
+    const s = Math.floor((Date.now() - startTime) / 1000);
+    document.getElementById('stat-uptime').textContent = s < 60 ? s + 's' : Math.floor(s / 60) + 'm' + (s % 60) + 's';
+  }
+}
+setInterval(updateStats, 500);
+
+setInterval(() => {
+  if (fileMsgPool.length) updateMsgFileInfo();
+}, 1000);
+
+setInterval(() => {
+  if (pendingOkCount > 0 && Date.now() - lastLogTime > UI_THROTTLE_MS) flushOkLog();
+  if (pendingErrCount > 0) flushErrLog();
+}, 500);
+/* ============================================================
    LOG
-   ═══════════════════════════════════════════════════ */
+   ============================================================ */
 function writeLog(msg, type = '') {
   const log = document.getElementById('log');
   if (!log) return;
   const line = document.createElement('div');
   line.className = 'll' + (type ? ' ' + type : '');
-  const t = new Date().toLocaleTimeString('vi-VN', { hour12:false });
+  const t = new Date().toLocaleTimeString('vi-VN', { hour12: false });
   const full = `[${t}] ${msg}`;
   line.textContent = full;
   line.dataset.text = full.toLowerCase();
@@ -621,17 +1328,17 @@ function flushErrLog() {
 function clearLog() {
   document.getElementById('log').innerHTML = '<div class="ll info">> [SYSTEM] Log đã xóa</div>';
   logsArchive = [];
-  notif('info', '📋 LOG', 'Đã xóa nhật ký');
+  notif('info', '📋 LOG', 'Đã xóa');
 }
 
 function exportLog() {
   if (!logsArchive.length) { showToast('Log rỗng!', 'warn'); return; }
-  const blob = new Blob([logsArchive.join('\n')], { type:'text/plain' });
+  const blob = new Blob([logsArchive.join('\n')], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `ccvc_log_${Date.now()}.txt`;
+  a.download = `ccvc_v11_log_${Date.now()}.txt`;
   a.click();
-  notif('success', '📥 EXPORT', `Đã lưu ${logsArchive.length} dòng log`);
+  notif('success', '📥 EXPORT', `Đã lưu ${logsArchive.length} dòng`);
 }
 
 function filterLog(q) {
@@ -643,9 +1350,64 @@ function filterLog(q) {
   });
 }
 
-/* ═══════════════════════════════════════════════════
-   PARTICLES + THEME + PROGRESS
-   ═══════════════════════════════════════════════════ */
+/* ============================================================
+   NOTIF / TOAST / AUDIO
+   ============================================================ */
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playBeep(type) {
+  if (!audioCtx) return;
+  try {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    const freq = type === 'error' ? 300 : type === 'warn' ? 500 : type === 'success' ? 900 : 700;
+    o.frequency.value = freq;
+    o.type = 'sine';
+    g.gain.value = 0.03;
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+    o.stop(audioCtx.currentTime + 0.12);
+  } catch {}
+}
+
+function notif(type, title, text, duration = 3000) {
+  const stack = document.getElementById('notif-stack');
+  if (!stack) return;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️', warn: '⚠️' };
+  const el = document.createElement('div');
+  el.className = 'notif ' + type;
+  el.innerHTML = `<div class="notif-icon">${icons[type] || 'ℹ️'}</div>
+    <div class="notif-body">
+      <div class="notif-title">${title}</div>
+      <div class="notif-text">${text}</div>
+    </div>`;
+  stack.appendChild(el);
+  setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, duration);
+  playBeep(type);
+}
+
+function showToast(message, type = 'info') {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️', warn: '⚠️' };
+  t.innerHTML = `<span style="font-size:22px">${icons[type] || 'ℹ️'}</span> ${message}`;
+  t.style.borderColor = type === 'error' ? 'var(--red)'
+    : type === 'warn' ? 'var(--gold)'
+    : type === 'success' ? 'var(--green)' : 'var(--cyan)';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ============================================================
+   PARTICLES / THEME / PROGRESS
+   ============================================================ */
 function spawnParticles(n = 8) {
   const wrap = document.getElementById('particles');
   if (!wrap) return;
@@ -656,7 +1418,7 @@ function spawnParticles(n = 8) {
     p.style.left = Math.random() * 100 + '%';
     p.style.animationDuration = (6 + Math.random() * 10) + 's';
     p.style.animationDelay = (-Math.random() * 10) + 's';
-    p.style.background = ['#00ffff','#ff00ff','#9d00ff','#ffd700'][i % 4];
+    p.style.background = ['#00ffff', '#ff00ff', '#9d00ff', '#ffd700'][i % 4];
     p.style.boxShadow = `0 0 8px ${p.style.background}`;
     wrap.appendChild(p);
   }
@@ -676,32 +1438,10 @@ function setProgress(pct) {
   bar.classList.toggle('active', pct > 0 && pct < 100);
   if (pct >= 100) setTimeout(() => { bar.style.width = '0'; bar.classList.remove('active'); }, 500);
 }
-/* ═══════════════════════════════════════════════════
-   SPEED CONTROL
-   ═══════════════════════════════════════════════════ */
-function setSpeed(ms) {
-  document.getElementById('delay').value = ms;
-  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-  let label = 'BALANCED', cls = 'speed-normal', color = 'bdg-ok';
-  if (ms <= 50) { label = 'TURBO'; cls = 'speed-turbo'; color = 'bdg-err'; }
-  else if (ms <= 500) { label = 'FAST'; cls = 'speed-fast'; color = 'bdg-warn'; }
-  else if (ms <= 1000) { label = 'NORMAL'; cls = 'speed-normal'; color = 'bdg-ok'; }
-  else { label = 'SAFE'; cls = 'speed-safe'; color = 'bdg-p'; }
-  const el = document.getElementById(cls);
-  if (el) {
-    el.classList.add('active');
-    if (cls === 'speed-turbo') el.classList.add('turbo');
-  }
-  const badge = document.getElementById('speed-badge');
-  badge.textContent = label;
-  badge.className = 'bdg ' + color;
-  localStorage.setItem('ccvc_speed', ms);
-  writeLog(`[SPEED] ${label} · ${ms}ms/tin ${ms <= 200 ? '(batch mode)' : ''}`, 'info');
-}
 
-/* ═══════════════════════════════════════════════════
+/* ============================================================
    TOKEN VAULT
-   ═══════════════════════════════════════════════════ */
+   ============================================================ */
 function addTokenField(val = '') {
   const c = document.getElementById('token-container');
   const n = c.querySelectorAll('.ti').length + 1;
@@ -729,595 +1469,146 @@ function saveTokens() {
     .filter(v => v);
   localStorage.setItem('ccvc_tks', JSON.stringify(tks));
   if (!tks.length) { showToast('Không có token để lưu!', 'warn'); return; }
-  notif('success', '💾 ĐÃ LƯU', `${tks.length} token vào bộ nhớ`);
+  notif('success', '💾 ĐÃ LƯU', `${tks.length} token`);
 }
 
 async function checkTokens() {
   const raw = Array.from(document.querySelectorAll('.token-input')).map(i => i.value);
   const tks = raw.map(sanitizeToken).filter(v => v);
   if (!tks.length) { showToast('Chưa có token!', 'error'); return; }
-  notif('info', '🔍 CHECK', `Đang kiểm tra ${tks.length} token...`);
+  notif('info', '🔍 CHECK', `Đang check ${tks.length} token...`);
   setProgress(0);
-
-  /* DEBUG: log độ dài token trước/sau khi sanitize */
-  raw.forEach((r, i) => {
-    if (!r) return;
-    const clean = sanitizeToken(r);
-    writeLog(`[DEBUG] raw len=${r.length} → clean len=${clean.length} (${clean.substring(0,15)}...${clean.slice(-10)})`, 'debug');
-  });
-
   let alive = 0, dead = 0, locked = 0;
   for (let i = 0; i < tks.length; i++) {
-    const t = tks[i];
     setProgress(Math.round((i / tks.length) * 100));
     try {
-      const r = await fetch('https://discord.com/api/v9/users/@me', {
-        headers: getHeaders(t),
+      const r = await fetch('https://discord.com/api/v10/users/@me', {
+        headers: getHeaders(tks[i]),
         cache: 'no-store'
       });
       if (r.ok) {
         const u = await r.json();
         alive++;
-        const age = getTokenAge(t);
+        const age = getTokenAge(tks[i]);
         writeLog(`[ALIVE] ${u.username} (age: ${age ? age.toFixed(0) + 'd' : '?'})`, 'success');
-      } else if (r.status === 401) { dead++; writeLog(`[DEAD] ${t.substring(0,12)}... (401)`, 'error'); }
-      else if (r.status === 403) { locked++; writeLog(`[LOCKED] ${t.substring(0,12)}... (403)`, 'warn'); }
-      else { dead++; writeLog(`[ERR] ${t.substring(0,12)}... (${r.status})`, 'error'); }
+      } else if (r.status === 401) { dead++; writeLog(`[DEAD] ${tks[i].slice(0, 12)}... (401)`, 'error'); }
+      else if (r.status === 403) { locked++; writeLog(`[LOCKED] ${tks[i].slice(0, 12)}... (403)`, 'warn'); }
+      else { dead++; writeLog(`[ERR] ${tks[i].slice(0, 12)}... (${r.status})`, 'error'); }
     } catch (e) { dead++; writeLog(`[NET] ${e.message}`, 'error'); }
-    await sleep(300);
+    await sleep(1000); // 1s/token — không đốt rate-limit
   }
   setProgress(100);
   notif(alive > 0 ? 'success' : 'error', '🔍 KẾT QUẢ',
     `✅ ${alive} sống · ❌ ${dead} chết · 🔒 ${locked} khóa`, 5000);
 }
 
-/* ═══════════════════════════════════════════════════
-   CONFIG
-   ═══════════════════════════════════════════════════ */
+/* ============================================================
+   CONFIG SAVE
+   ============================================================ */
 function saveConfig() {
-  const fields = ['channels','tag_mode','tag_id','delay','msg','burst_limit','retry_429','min_age','batch_size'];
+  const fields = ['channels', 'tag_mode', 'tag_id', 'tag_pos', 'delay', 'msg', 'burst_limit',
+    'retry_429', 'min_age', 'batch_size', 'ch_cooldown', 'cycle_run', 'cycle_rest', 'proxies'];
   fields.forEach(f => {
     const el = document.getElementById(f);
     if (el) localStorage.setItem('ccvc_' + f, el.value);
   });
-  const antiKeys = ['anti_super_props','anti_gateway','anti_random_channel','anti_random_token',
-    'anti_age','anti_penalty','anti_global','anti_autothrottle','anti_sanitize','anti_retry',
-    'no_repeat','reset_when_empty','tag_after'];
+  const antiKeys = ['anti_super_props', 'anti_global', 'anti_penalty', 'anti_age',
+    'anti_proactive', 'anti_jitter', 'anti_sanitize', 'anti_retry',
+    'no_repeat', 'reset_when_empty', 'prefix_hash', 'auto_cycle', 'auto_throttle', 'proxy_sticky'];
   antiKeys.forEach(k => {
     const el = document.getElementById(k);
     if (el) localStorage.setItem(k, el.checked);
   });
-  notif('success', '⚙️ CẤU HÌNH', 'Đã lưu toàn bộ cài đặt');
+  clearFingerprintCaches();
+  parseProxies();
+  notif('success', '⚙️ CẤU HÌNH', 'Đã lưu');
 }
 
-/* ═══════════════════════════════════════════════════
-   NETWORK — fetch retry + no-store cache
-   ═══════════════════════════════════════════════════ */
-async function fetchWithRetry(url, opts, maxRetries = 2) {
-  const useRetry = document.getElementById('anti_retry')?.checked;
-  const tries = useRetry ? maxRetries : 1;
-  let lastErr;
-  for (let i = 0; i < tries; i++) {
-    try {
-      return await fetch(url, { ...opts, cache: 'no-store' });
-    } catch (e) {
-      lastErr = e;
-      if (i < tries - 1) await sleep(500 * Math.pow(2, i));
-    }
-  }
-  throw lastErr;
-}
-
-/* ═══════════════════════════════════════════════════
-   MESSAGE PICKER — file pool + không trùng
-   ═══════════════════════════════════════════════════ */
-function loadMsgFile(e) {
-  const f = e.target.files[0];
-  if (!f) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    let raw = String(reader.result || '');
-    let lines = [];
-    const name = (f.name || '').toLowerCase();
-
-    if (name.endsWith('.json')) {
-      try {
-        const j = JSON.parse(raw);
-        if (Array.isArray(j)) lines = j.map(x => String(x));
-        else if (j && typeof j === 'object') lines = Object.values(j).map(x => String(x));
-      } catch {
-        notif('error', '📂 FILE LỖI', 'JSON không hợp lệ');
-        return;
-      }
-    } else {
-      lines = raw.split(/\r?\n/);
-      if (lines.length === 1 && lines[0].includes(',')) {
-        lines = lines[0].split(',');
-      }
-    }
-
-    lines = lines.map(x => String(x).trim()).filter(x => x.length > 0);
-    const unique = [...new Set(lines)];
-
-    if (!unique.length) {
-      notif('error', '📂 FILE RỖNG', 'Không có câu hợp lệ');
-      return;
-    }
-
-    fileMsgPool = unique;
-    fileMsgUsed.clear();
-    fileMsgSource = f.name;
-    updateMsgFileInfo();
-    const dupes = lines.length - unique.length;
-    notif('success', '📂 ĐÃ NẠP FILE',
-      `${unique.length} câu${dupes > 0 ? ` (loại ${dupes} trùng)` : ''}`, 5000);
-    writeLog(`[FILE] Nạp ${unique.length} câu từ "${f.name}"`, 'success');
-  };
-  reader.readAsText(f, 'utf-8');
-}
-
-function clearMsgFile() {
-  fileMsgPool = [];
-  fileMsgUsed.clear();
-  fileMsgSource = '';
-  const inp = document.getElementById('file_msg');
-  if (inp) inp.value = '';
-  updateMsgFileInfo();
-  notif('info', '📂 FILE', 'Đã xóa file câu');
-}
-
-function updateMsgFileInfo() {
-  const el = document.getElementById('msg-file-info');
-  if (!el) return;
-  if (!fileMsgPool.length) { el.textContent = ''; el.classList.remove('warn'); return; }
-  const used = fileMsgUsed.size;
-  const total = fileMsgPool.length;
-  const remain = total - used;
-  el.innerHTML = `📂 <b>${fileMsgSource}</b> · dùng ${used}/${total} · còn ${remain}`;
-  el.classList.toggle('warn', remain === 0);
-}
-
-function showMsgStats() {
-  if (!fileMsgPool.length) { notif('warn', '📊 THỐNG KÊ', 'Chưa có file câu nào'); return; }
-  const total = fileMsgPool.length;
-  const used = fileMsgUsed.size;
-  notif('info', '📊 THỐNG KÊ FILE', `Tổng: ${total} · Đã dùng: ${used} · Còn: ${total - used}`, 5000);
-}
-
-function pickRandomMessage(msgText) {
-  if (fileMsgPool.length) {
-    const noRepeat = document.getElementById('no_repeat')?.checked;
-    const resetWhenEmpty = document.getElementById('reset_when_empty')?.checked;
-
-    if (noRepeat) {
-      if (fileMsgUsed.size >= fileMsgPool.length) {
-        if (resetWhenEmpty) {
-          fileMsgUsed.clear();
-        } else {
-          return fileMsgPool[rand(0, fileMsgPool.length - 1)];
-        }
-      }
-      let idx, tries = 0;
-      do {
-        idx = rand(0, fileMsgPool.length - 1);
-        tries++;
-      } while (fileMsgUsed.has(idx) && tries < 30);
-      if (fileMsgUsed.has(idx)) {
-        for (let i = 0; i < fileMsgPool.length; i++) {
-          if (!fileMsgUsed.has(i)) { idx = i; break; }
-        }
-      }
-      fileMsgUsed.add(idx);
-      return fileMsgPool[idx];
-    } else {
-      return fileMsgPool[rand(0, fileMsgPool.length - 1)];
-    }
-  }
-  const v = msgText.split('\n').map(x => x.trim()).filter(x => x);
-  if (!v.length) return '';
-  return v[rand(0, v.length - 1)];
-}
-
-/* ═══════════════════════════════════════════════════
-   PREWARM (chỉ SAFE mode)
-   ═══════════════════════════════════════════════════ */
-async function prewarm(token, channelId) {
-  try {
-    await fetchWithRetry('https://discord.com/api/v9/users/@me', { headers: getHeaders(token) }, 2);
-    await sleep(rand(150, 350));
-    await fetchWithRetry('https://discord.com/api/v9/users/@me/guilds', { headers: getHeaders(token) }, 2);
-    await sleep(rand(150, 350));
-    await fetchWithRetry(`https://discord.com/api/v9/channels/${channelId}`, { headers: getHeaders(token) }, 2);
-  } catch {}
-}
-
-/* ═══════════════════════════════════════════════════
-   GATEWAY WEBSOCKET
-   ═══════════════════════════════════════════════════ */
-function connectGateway(token) {
-  if (!document.getElementById('anti_gateway')?.checked) return;
-  if (wsConnections.has(token)) return;
-  try {
-    const ws = new WebSocket('wss://gateway.discord.gg/?v=9&encoding=json');
-    wsConnections.set(token, ws);
-    let hb = null, seq = null;
-    ws.onopen = () => writeLog(`[WS] ${token.substring(0,10)}... kết nối`, 'ws');
-    ws.onmessage = (ev) => {
-      try {
-        const pkt = JSON.parse(ev.data);
-        if (pkt.s !== null && pkt.s !== undefined) seq = pkt.s;
-        if (pkt.op === 10) {
-          hb = setInterval(() => {
-            if (ws.readyState === 1) ws.send(JSON.stringify({ op:1, d:seq }));
-          }, pkt.d.heartbeat_interval);
-          const p = getProfile(token);
-          ws.send(JSON.stringify({
-            op: 2,
-            d: {
-              token,
-              capabilities: 30717,
-              properties: {
-                os: p.os, browser: p.browser, device: '',
-                system_locale: p.locale,
-                browser_user_agent: p.ua, browser_version: p.version,
-                os_version: p.osVer, client_build_number: buildNumber,
-                client_version: p.version, native_build_number: null
-              },
-              presence: { status:'online', since:0, activities:[], afk:false },
-              compress: false,
-              client_state: { guild_versions: {} }
-            }
-          }));
-        } else if (pkt.op === 0 && pkt.t === 'READY') {
-          writeLog(`[WS] ${token.substring(0,10)}... ONLINE ✓`, 'ws');
-          updateStats();
-        } else if (pkt.op === 9) {
-          ws.close();
-        }
-      } catch {}
-    };
-    ws.onclose = () => {
-      if (hb) clearInterval(hb);
-      wsConnections.delete(token);
-      updateStats();
-      if (isRunning) setTimeout(() => connectGateway(token), 5000);
-    };
-  } catch (e) {
-    writeLog(`[WS] Không kết nối: ${e.message}`, 'error');
-  }
-}
-
-function closeAllGateways() {
-  wsConnections.forEach((ws) => { try { ws.close(); } catch {} });
-  wsConnections.clear();
-  updateStats();
-}
-/* ═══════════════════════════════════════════════════
-   STATS UI
-   ═══════════════════════════════════════════════════ */
-function animateNumber(el, to) {
-  const from = parseInt(el.textContent) || 0;
-  if (from === to) return;
-  const dur = 300;
-  const start = performance.now();
-  const ease = (p) => 1 - Math.pow(1 - p, 3);
-  const step = (t) => {
-    const p = Math.min(1, (t - start) / dur);
-    el.textContent = Math.floor(from + (to - from) * ease(p));
-    if (p < 1) requestAnimationFrame(step);
-    else el.textContent = to;
-  };
-  requestAnimationFrame(step);
-}
-
-function updateStats() {
-  animateNumber(document.getElementById('stat-sent'), sentCount);
-  animateNumber(document.getElementById('stat-fail'), failCount);
-  animateNumber(document.getElementById('stat-skip'), skipCount);
-  animateNumber(document.getElementById('stat-ws'), wsConnections.size);
-  animateNumber(document.getElementById('stat-429'), rlCount);
-  animateNumber(document.getElementById('stat-age'), ageSkipped);
-  animateNumber(document.getElementById('stat-penalty'), penaltyCount);
-  const now = Date.now();
-  speedWindow = speedWindow.filter(t => now - t < 10000);
-  document.getElementById('stat-rate').textContent = (speedWindow.length / 10).toFixed(1);
-  const th = document.getElementById('stat-throttle');
-  if (th) {
-    const pct = Math.round(globalThrottleFactor * 100);
-    th.textContent = pct + '%';
-    th.style.color = pct >= 90 ? 'var(--green)' : pct >= 60 ? 'var(--gold)' : 'var(--red)';
-  }
-}
-setInterval(updateStats, 500);
-
-setInterval(() => {
-  if (fileMsgPool.length) updateMsgFileInfo();
-}, 1000);
-
-setInterval(() => {
-  const now = Date.now();
-  const isTurbo = parseInt(document.getElementById('delay')?.value || 1000) <= 200;
-  const threshold = isTurbo ? turboLogMs : uiThrottleMs;
-  if (pendingOkCount > 0 && now - lastLogTime > threshold) {
-    flushOkLog();
-  }
-  if (pendingErrCount > 0) flushErrLog();
-}, 500);
-
-/* ═══════════════════════════════════════════════════
-   SEND MESSAGE — tag sau câu
-   ═══════════════════════════════════════════════════ */
-async function sendMessage(token, channelId, cfg, nonceOut) {
-  let baseMsg = pickRandomMessage(cfg.msgText);
-  if (!baseMsg) baseMsg = '...';
-  let content = baseMsg;
-
-  const tagAfter = document.getElementById('tag_after')?.checked;
-  if (cfg.tagMode === 'everyone') {
-    content = tagAfter ? `${content} @everyone` : `@everyone ${content}`;
-  }
-  if (cfg.tagMode === 'user' && cfg.tagId) {
-    content = tagAfter ? `${content} <@${cfg.tagId}>` : `<@${cfg.tagId}> ${content}`;
-  }
-
-  const nonce = (BigInt(Date.now()) << 22n | BigInt(rand(0, 4194303))).toString();
-  nonceOut.v = nonce;
-
-  const fd = new FormData();
-  fd.append('content', content);
-  fd.append('nonce', nonce);
-  fd.append('tts', 'false');
-
-  return fetchWithRetry(
-    `https://discord.com/api/v9/channels/${channelId}/messages`,
-    { method:'POST', headers: getHeaders(token), body: fd },
-    2
-  );
-}
-
-/* ═══════════════════════════════════════════════════
-   FIRE ONE
-   ═══════════════════════════════════════════════════ */
-async function fireOne(token, channelId, cfg, state, short) {
-  if (!isRunning || skippedTokens.has(token)) return;
-  try {
-    const nonceOut = { v: null };
-    const res = await sendMessage(token, channelId, cfg, nonceOut);
-    if (!isRunning) return;
-
-    if (res.ok) {
-      sentCount++; state.sentCount++; state.msgInHour.push(Date.now());
-      speedWindow.push(Date.now());
-      pendingOkCount++;
-      goodStreak++;
-      if (goodStreak >= 200 && globalThrottleFactor < 1.0) {
-        globalThrottleFactor = Math.min(1.0, globalThrottleFactor * 1.1);
-        goodStreak = 0;
-        writeLog(`[RECOVER] Throttle → ${Math.round(globalThrottleFactor * 100)}%`, 'recover');
-      }
-      if (Date.now() - lastLogTime > uiThrottleMs || pendingOkCount >= 20) {
-        flushOkLog();
-      }
-      if (sentCount % 500 === 0) notif('success', '🎉 MILESTONE', `Đã gửi ${sentCount} tin!`, 3000);
-
-    } else if (res.status === 429) {
-      rlCount++;
-      let wait = cfg.retry429;
-      let isGlobal = false;
-      try {
-        const d = await res.json();
-        if (d.retry_after) wait = Math.ceil(d.retry_after * 1000) + 500;
-        if (d.global === true) isGlobal = true;
-      } catch {}
-      const globalHdr = res.headers.get('x-ratelimit-global');
-      if (globalHdr === 'true') isGlobal = true;
-
-      const useGlobal = document.getElementById('anti_global')?.checked;
-      const useAuto = document.getElementById('anti_autothrottle')?.checked;
-
-      if (isGlobal && useGlobal) {
-        globalPenaltyUntil = Math.max(globalPenaltyUntil, Date.now() + wait);
-        globalCount++;
-        if (useAuto) {
-          globalThrottleFactor = Math.max(0.2, globalThrottleFactor * 0.75);
-        }
-        lastGlobalHit = Date.now();
-        goodStreak = 0;
-        writeLog(`[GLOBAL] 429 · throttle ${Math.round(globalThrottleFactor * 100)}%`, 'global');
-        notif('error', '🌍 GLOBAL RATE', `Auto-throttle: ${Math.round(globalThrottleFactor * 100)}%`, 3500);
-      } else if (document.getElementById('anti_penalty')?.checked) {
-        state.penalty = Date.now() + wait;
-        penaltyCount++;
-        if (useAuto) {
-          globalThrottleFactor = Math.max(0.4, globalThrottleFactor * 0.95);
-        }
-        goodStreak = 0;
-      } else {
-        skippedTokens.add(token); skipCount++;
-      }
-
-    } else if (res.status === 401 || res.status === 403) {
-      failCount++; skippedTokens.add(token);
-      writeLog(`[DEAD] ${short}... die/ban (${res.status})`, 'error');
-      notif('error', '💀 TOKEN DIE', `${short}... (${res.status})`, 3000);
-
-    } else {
-      failCount++;
-      pendingErrCount++;
-      if (pendingErrCount >= 5) flushErrLog();
-    }
-  } catch (e) {
-    failCount++;
-    pendingErrCount++;
-    if (pendingErrCount >= 5) flushErrLog();
-  }
-}
-
-/* ═══════════════════════════════════════════════════
-   WORKER
-   ═══════════════════════════════════════════════════ */
-async function runTokenWorker(token, cfg) {
-  const state = tokenStates.get(token);
-  const short = token.substring(0, 10);
-  state.penalty = 0;
-
-  if (cfg.antiAge && cfg.minAge > 0) {
-    const age = getTokenAge(token);
-    if (age !== null && age < cfg.minAge) {
-      ageSkipped++; updateStats();
-      writeLog(`[AGE] ${short}... tuổi ${age.toFixed(0)}d < ${cfg.minAge}d → SKIP`, 'warn');
-      return;
-    }
-  }
-
-  if (cfg.baseDelay > 500) {
-    await prewarm(token, cfg.chs[0]);
-    if (!isRunning) return;
-  }
-
-  const turbo = cfg.baseDelay <= 200;
-  const userBatchSize = Math.max(1, Math.min(100, cfg.batchSize || 8));
-  const useAuto = document.getElementById('anti_autothrottle')?.checked;
-  const tokenOffset = stableHash(short) % 5;
-
-  while (isRunning) {
-    if (skippedTokens.has(token)) return;
-    if (globalPenaltyUntil > Date.now()) { await sleep(500); continue; }
-    if (state.penalty > Date.now()) { await sleep(250); continue; }
-
-    const now = Date.now();
-    state.msgInHour = state.msgInHour.filter(t => now - t < 3600000);
-    if (cfg.burstLimit > 0 && state.msgInHour.length >= cfg.burstLimit) {
-      writeLog(`[LIMIT] ${short}... đạt ${cfg.burstLimit} tin/giờ, nghỉ 60s`, 'warn');
-      await sleep(60000);
-      continue;
-    }
-
-    const chs = cfg.antiRandomChannel ? shuffle(cfg.chs) : cfg.chs;
-
-    if (turbo) {
-      const effectiveBatch = useAuto
-        ? Math.max(2, Math.floor(userBatchSize * globalThrottleFactor))
-        : userBatchSize;
-
-      const promises = [];
-      for (let i = 0; i < chs.length; i += effectiveBatch) {
-        if (!isRunning || skippedTokens.has(token)) break;
-        if (globalPenaltyUntil > Date.now()) break;
-        if (state.penalty > Date.now()) break;
-
-        const batch = chs.slice(i, i + effectiveBatch);
-        promises.push(Promise.all(batch.map(ch => fireOne(token, ch, cfg, state, short))));
-
-        await sleep(rand(1, 3) + tokenOffset);
-      }
-      await Promise.all(promises);
-      if (!isRunning) return;
-      await sleep(Math.max(10, cfg.baseDelay + rand(-10, 10)));
-
-    } else {
-      for (const channelId of chs) {
-        if (!isRunning || skippedTokens.has(token)) return;
-        if (state.penalty > Date.now()) break;
-
-        await fireOne(token, channelId, cfg, state, short);
-        if (!isRunning) return;
-
-        const base = cfg.baseDelay;
-        const wait = base + rand(-Math.floor(base * 0.15), Math.floor(base * 0.15));
-        await sleep(Math.max(80, wait));
-      }
-    }
-  }
-}
-
-/* ═══════════════════════════════════════════════════
+/* ============================================================
    START / STOP
-   ═══════════════════════════════════════════════════ */
-async function start(mode = 'text') {
-  if (isRunning) { notif('warn', '⚠️ ĐANG CHẠY', 'Tool đang chạy, dừng trước!'); return; }
+   ============================================================ */
+async function start() {
+  if (isRunning) { notif('warn', '⚠️ ĐANG CHẠY', 'Dừng trước!'); return; }
 
   const raw = Array.from(document.querySelectorAll('.token-input')).map(i => i.value);
   const tks = raw.map(sanitizeToken).filter(v => v);
   const chs = document.getElementById('channels').value.split('\n').map(v => v.trim()).filter(v => v);
+  const msgText = document.getElementById('msg').value;
+  const hasFile = fileMsgPool.length > 0;
+  const hasMsg = msgText.split('\n').map(s => s.trim()).filter(s => s).length > 0;
 
-  if (!tks.length) { notif('error', '❌ THIẾU TOKEN', 'Chưa có token!'); showToast('Chưa có token!', 'error'); return; }
-  if (!chs.length) { notif('error', '❌ THIẾU CHANNEL', 'Chưa có channel ID!'); showToast('Chưa có channel!', 'error'); return; }
-
-  /* DEBUG: log token len trước/sau sanitize */
-  raw.forEach(r => {
-    if (!r) return;
-    const clean = sanitizeToken(r);
-    writeLog(`[DEBUG] raw=${r.length} clean=${clean.length} head="${clean.substring(0,12)}" tail="${clean.slice(-8)}"`, 'debug');
-  });
+  if (!tks.length) { notif('error', '❌ TOKEN', 'Chưa có token!'); return; }
+  if (!chs.length) { notif('error', '❌ CHANNEL', 'Chưa có channel!'); return; }
+  if (!hasFile && !hasMsg) { notif('error', '❌ NỘI DUNG', 'Chưa có câu để gửi!'); return; }
 
   isRunning = true;
+  stopRequested = false;
+  cycleResting = false;
   sentCount = 0; failCount = 0; skipCount = 0;
-  rlCount = 0; ageSkipped = 0; penaltyCount = 0; globalCount = 0;
+  rlCount = 0; ageSkipped = 0; penaltyCount = 0; typingCount = 0;
   speedWindow = [];
   pendingOkCount = 0; pendingErrCount = 0;
   lastLogTime = 0;
-  skippedTokens.clear(); tokenStates.clear();
+  lastMilestoneNotif = 0;
+  skippedTokens.clear();
+  tokenStates.clear();
+  rateBuckets.clear();
+  channelCooldown.clear();
+  msgQueue = [];
+  activeRequests = 0;
   globalPenaltyUntil = 0;
   globalThrottleFactor = 1.0;
-  lastGlobalHit = 0;
   goodStreak = 0;
+  goodStreakStart = 0;
   startTime = Date.now();
-  updateStats();
 
+  clearFingerprintCaches();
+  parseProxies();
   document.getElementById('status-dot').classList.add('active');
   document.body.classList.add('spamming');
+  document.getElementById('stat-cycle').textContent = 'RUN';
+  document.getElementById('stat-cycle').style.color = 'var(--green)';
 
-  const delayMs = Math.max(20, parseInt(document.getElementById('delay').value) || 1000);
-  const turbo = delayMs <= 200;
-  const batchSize = Math.max(1, Math.min(100, parseInt(document.getElementById('batch_size').value) || 8));
-  writeLog(`[START] ${turbo ? '⚡ TURBO' : 'NORMAL'} · ${delayMs}ms · batch ${batchSize} · ${tks.length} token · ${chs.length} ch`, 'info');
-  notif('success', '🚀 ANH EM CCVC',
-    `${turbo ? 'TURBO batch ' + batchSize : 'NORMAL'} · ${tks.length} tk · ${chs.length} ch`, 4000);
-  showToast('⚡ MÃI ĐỈNH! Đang tấn công!', 'success');
+  const delayMs = Math.max(10, parseInt(document.getElementById('delay').value) || 1200);
+  const batchSize = Math.max(1, Math.min(100, parseInt(document.getElementById('batch_size').value) || 6));
+  const turbo = delayMs <= 100;
+
+  writeLog(`[START] ${turbo ? '☠️ TURBO' : 'NORMAL'} · ${delayMs}ms · batch ${batchSize} · ${tks.length} tk · ${chs.length} ch`, 'info');
+  notif('success', '🚀 V11 KHỞI ĐỘNG', `${tks.length} tk · ${chs.length} ch · ${delayMs}ms`, 3500);
+  showToast('⚡ MÃI ĐỈNH!', 'success');
 
   const cfg = {
     chs,
-    msgText: document.getElementById('msg').value,
-    tagMode: document.getElementById('tag_mode').value,
-    tagId: document.getElementById('tag_id').value.trim(),
     baseDelay: delayMs,
     batchSize,
     burstLimit: parseInt(document.getElementById('burst_limit').value) || 0,
     retry429: parseInt(document.getElementById('retry_429').value) || 3000,
     minAge: parseInt(document.getElementById('min_age').value) || 0,
-    antiRandomChannel: document.getElementById('anti_random_channel').checked,
-    antiAge: document.getElementById('anti_age').checked
+    antiAge: document.getElementById('anti_age')?.checked
   };
 
-  if (document.getElementById('anti_gateway').checked) {
-    writeLog(`[WS] Đang kết nối ${tks.length} gateway...`, 'ws');
-    notif('info', '🌐 GATEWAY', `Đang kết nối ${tks.length} WebSocket...`);
-    const order = document.getElementById('anti_random_token').checked ? shuffle(tks) : tks;
-    order.forEach(t => connectGateway(t));
-    await sleep(1500);
-  }
-
   tks.forEach(t => tokenStates.set(t, { sentCount: 0, msgInHour: [], penalty: 0 }));
-  await Promise.all(tks.map(token => runTokenWorker(token, cfg)));
 
-  if (pendingOkCount > 0) flushOkLog();
-  if (pendingErrCount > 0) flushErrLog();
+  cycleManager();
 
+  await Promise.allSettled(tks.map(token => runTokenWorker(token, cfg)));
+
+  isRunning = false;
   document.getElementById('status-dot').classList.remove('active');
   document.body.classList.remove('spamming');
-  closeAllGateways();
-  const elapsed = ((Date.now() - startTime) / 1000).toFixed(0);
-  notif('info', '⏹️ KẾT THÚC', `Đã gửi ${sentCount} · lỗi ${failCount} · ${elapsed}s`, 4500);
+  if (pendingOkCount > 0) flushOkLog();
+  if (pendingErrCount > 0) flushErrLog();
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  notif('info', '⏹️ KẾT THÚC', `Gửi ${sentCount} · lỗi ${failCount} · ${elapsed}s`, 4500);
   writeLog(`[END] ${sentCount} gửi · ${failCount} lỗi · ${skipCount} skip · ${elapsed}s`, 'info');
 }
 
 function stop() {
   if (!isRunning) { notif('warn', '⚠️ KHÔNG CHẠY', 'Tool chưa chạy!'); return; }
   isRunning = false;
+  stopRequested = true;
   document.getElementById('status-dot').classList.remove('active');
   document.body.classList.remove('spamming');
-  closeAllGateways();
   if (pendingOkCount > 0) flushOkLog();
   if (pendingErrCount > 0) flushErrLog();
   writeLog('[STOP] Đã dừng toàn bộ worker', 'warn');
@@ -1325,22 +1616,22 @@ function stop() {
   showToast('🛑 Đã dừng', 'warn');
 }
 
-/* ═══════════════════════════════════════════════════
+/* ============================================================
    KEYBOARD
-   ═══════════════════════════════════════════════════ */
+   ============================================================ */
 document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); start('text'); }
+  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); start(); }
   else if (e.key === 'Escape' && isRunning) { e.preventDefault(); stop(); }
   else if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveConfig(); }
   else if (e.ctrlKey && e.key === 'l') { e.preventDefault(); clearLog(); }
 });
 
-/* ═══════════════════════════════════════════════════
+/* ============================================================
    BUILD NUMBER
-   ═══════════════════════════════════════════════════ */
+   ============================================================ */
 async function fetchBuildNumber() {
   try {
-    const res = await fetch('https://discord.com/login', { mode:'cors', cache:'no-store' });
+    const res = await fetch('https://discord.com/login', { mode: 'cors', cache: 'no-store' });
     const html = await res.text();
     const m = html.match(/buildNumber["\s:]+([0-9]{6})/);
     if (m) { buildNumber = parseInt(m[1]); writeLog(`[BUILD] #${buildNumber}`, 'info'); }
@@ -1349,9 +1640,9 @@ async function fetchBuildNumber() {
   }
 }
 
-/* ═══════════════════════════════════════════════════
+/* ============================================================
    BOOT
-   ═══════════════════════════════════════════════════ */
+   ============================================================ */
 window.addEventListener('DOMContentLoaded', async () => {
   spawnParticles(8);
   initAudio();
@@ -1364,7 +1655,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     tks.forEach(t => addTokenField(t));
   }
 
-  const fields = ['channels','tag_mode','tag_id','delay','msg','burst_limit','retry_429','min_age','batch_size'];
+  const fields = ['channels', 'tag_mode', 'tag_id', 'tag_pos', 'delay', 'msg', 'burst_limit',
+    'retry_429', 'min_age', 'batch_size', 'ch_cooldown', 'cycle_run', 'cycle_rest', 'proxies'];
   fields.forEach(f => {
     const v = localStorage.getItem('ccvc_' + f);
     if (v !== null) {
@@ -1373,9 +1665,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  const antiKeys = ['anti_super_props','anti_gateway','anti_random_channel','anti_random_token',
-    'anti_age','anti_penalty','anti_global','anti_autothrottle','anti_sanitize','anti_retry',
-    'no_repeat','reset_when_empty','tag_after'];
+  const antiKeys = ['anti_super_props', 'anti_global', 'anti_penalty', 'anti_age',
+    'anti_proactive', 'anti_jitter', 'anti_sanitize', 'anti_retry',
+    'no_repeat', 'reset_when_empty', 'prefix_hash', 'auto_cycle', 'auto_throttle', 'proxy_sticky'];
   antiKeys.forEach(k => {
     const el = document.getElementById(k);
     if (!el) return;
@@ -1383,16 +1675,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (v !== null) el.checked = v === 'true';
   });
 
-  const savedSpeed = parseInt(localStorage.getItem('ccvc_speed')) || 1000;
-  setSpeed(savedSpeed);
+  const savedTyping = localStorage.getItem('ccvc_typing') || 'short';
+  setTyping(savedTyping);
+
+  const savedPreset = localStorage.getItem('ccvc_preset') || 'balanced';
+  setPreset(savedPreset);
+
+  parseProxies();
   updateStats();
   updateMsgFileInfo();
+  updateThrottleUI();
 
   await fetchBuildNumber();
 
-  notif('success', '👑 ANH EM CCVC V9', `MÃI ĐỈNH · ${tks.length} token · build #${buildNumber}`, 4500);
-  writeLog(`[BOOT] ANH EM CCVC V9 iOS FIX · ${tks.length} token · build #${buildNumber}`, 'success');
-  writeLog('[HINT] Ctrl+Enter: SPAM · Esc: DỪNG · Token sẽ tự strip ký tự ẩn iOS', 'info');
+  notif('success', '👑 ANH EM CCVC V11', `Sẵn sàng · ${tks.length} token · build #${buildNumber}`, 4000);
+  writeLog(`[BOOT] V11 MAI ĐỈNH · ${tks.length} token · build #${buildNumber}`, 'success');
+  writeLog('[HINT] Ctrl+Enter: SPAM · Esc: DỪNG · Ctrl+S: Lưu · Ctrl+L: Xóa log', 'info');
 });
 </script>
 </body>
