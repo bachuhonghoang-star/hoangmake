@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>👑 ANH EM CCVC — V11 MAI ĐỈNH</title>
+<title>👑 ANH EM CCVC — V11.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -195,7 +195,7 @@ body.spamming .progress.active{animation:none !important}
       <div class="logo">👑</div>
       <div>
         <div class="htitle">ANH EM CCVC</div>
-        <div class="hsub">MÃI ĐỈNH · V11 PROXY-READY</div>
+        <div class="hsub">MÃI ĐỈNH · V11.1 MOBILE-FIX</div>
       </div>
     </div>
     <button class="tbtn" id="theme-btn" onclick="toggleTheme()">🌙</button>
@@ -287,7 +287,7 @@ body.spamming .progress.active{animation:none !important}
   <div class="ch"><span class="ci">🌐</span><span class="ct">PROXY (TÙY CHỌN)</span><span class="bdg bdg-warn">OPTIONAL</span></div>
   <div class="fg">
     <label>DANH SÁCH PROXY (MỖI DÒNG 1 — TRỐNG = IP GỐC)</label>
-    <textarea id="proxies" rows="3" placeholder="http://user:pass@ip:port&#10;socks5://ip:port&#10;http://ip:port"></textarea>
+    <textarea id="proxies" rows="3" placeholder="http://user:pass@ip:port&#10;socks5://ip:port"></textarea>
   </div>
   <div class="tr">
     <div class="tl"><span class="ic">📌</span><div>STICKY PER TOKEN<span class="td">Mỗi token gắn 1 proxy cố định</span></div></div>
@@ -311,8 +311,8 @@ body.spamming .progress.active{animation:none !important}
   <div class="ch"><span class="ci">⌨️</span><span class="ct">FAKE GÕ</span><span class="bdg bdg-p" id="typing-badge">SHORT</span></div>
   <div class="g4" style="margin-bottom:14px">
     <button class="preset-btn" id="typing-off" onclick="setTyping('off')">OFF<span class="sub">gửi thẳng</span></button>
-    <button class="preset-btn" id="typing-short" onclick="setTyping('short')">SHORT<span class="sub">300-1200ms</span></button>
-    <button class="preset-btn active" id="typing-realistic" onclick="setTyping('realistic')">REALISTIC<span class="sub">theo độ dài tin</span></button>
+    <button class="preset-btn active" id="typing-short" onclick="setTyping('short')">SHORT<span class="sub">300-1200ms</span></button>
+    <button class="preset-btn" id="typing-realistic" onclick="setTyping('realistic')">REALISTIC<span class="sub">theo độ dài tin</span></button>
     <button class="preset-btn" id="typing-mixed" onclick="setTyping('mixed')">MIXED<span class="sub">random 2 mode</span></button>
   </div>
   <div class="msg-info">REALISTIC mô phỏng tốc độ gõ người 4-7 ký tự/giây · tin 100 ký tự ≈ 15-20s</div>
@@ -416,7 +416,7 @@ body.spamming .progress.active{animation:none !important}
     <input type="text" id="log-search" placeholder="🔍 Tìm trong log..." oninput="filterLog(this.value)" style="flex:1;padding:8px 12px;font-size:12px">
   </div>
   <div class="log" id="log">
-    <div class="ll info">> [SYSTEM] ANH EM CCVC — V11 khởi động...</div>
+    <div class="ll info">> [SYSTEM] ANH EM CCVC — V11.1 khởi động...</div>
     <div class="ll success">> [READY] Anti-ban core: ACTIVE</div>
     <div class="ll anti">> [READY] Super properties per-token: ARMED</div>
     <div class="ll global">> [READY] Global 429 detect: ARMED</div>
@@ -424,6 +424,7 @@ body.spamming .progress.active{animation:none !important}
     <div class="ll typing">> [READY] Fake typing: SHORT mode</div>
     <div class="ll info">> [READY] Proactive rate-limit: ARMED</div>
     <div class="ll info">> [READY] Pipeline engine: STANDBY</div>
+    <div class="ll info">> [PATCH] Header cleanup: mobile Chrome safe</div>
   </div>
 </div>
 
@@ -449,36 +450,28 @@ let tokenStates = new Map();
 let skippedTokens = new Set();
 let globalPenaltyUntil = 0;
 
-/* Throttle */
 let globalThrottleFactor = 1.0;
 let goodStreak = 0;
 let goodStreakStart = 0;
 
-/* Rate-limit buckets */
 let rateBuckets = new Map();
 
-/* Semaphore */
 let activeRequests = 0;
 let MAX_CONCURRENT = 40;
 
-/* Channel cooldown */
 let channelCooldown = new Map();
 
-/* Message pool */
 let fileMsgPool = [];
 let fileMsgUsed = new Set();
 let fileMsgSource = '';
 let msgQueue = [];
 
-/* Proxy */
 let proxyList = [];
 let proxyAssign = new Map();
 let proxyIndex = 0;
 
-/* Typing mode */
 let typingMode = 'short';
 
-/* Log throttle */
 let lastLogTime = 0;
 let pendingOkCount = 0;
 let pendingErrCount = 0;
@@ -540,49 +533,12 @@ function getTokenAge(token) {
 }
 
 /* ============================================================
-   FINGERPRINT — per-token device_id từ localStorage seed
+   FINGERPRINT — chỉ dùng cho super properties + locale
    ============================================================ */
-const UA_POOL = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 OPR/116.0.0.0',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0'
-];
 const TIMEZONES = ['Asia/Ho_Chi_Minh','Asia/Bangkok','Asia/Singapore','Asia/Tokyo','Asia/Hong_Kong','Asia/Seoul','America/New_York','America/Los_Angeles','America/Chicago','Europe/London','Europe/Berlin','Europe/Paris','Australia/Sydney'];
 const LOCALES = ['en-US','en-GB','vi-VN','ja-JP','de-DE','fr-FR','ko-KR','th-TH','zh-CN'];
-
-function parseUA(ua) {
-  const out = { ua, browser:'Chrome', version:'131.0.0.0', major:'131', os:'Windows', osVer:'10', platform:'"Windows"', mobile:'?0' };
-  if (/Firefox\/([\d.]+)/.test(ua)) { out.browser='Firefox'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
-  else if (/Edg\/([\d.]+)/.test(ua)) { out.browser='Edge'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
-  else if (/OPR\/([\d.]+)/.test(ua)) { out.browser='Opera'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
-  else if (/Chrome\/([\d.]+)/.test(ua)) { out.browser='Chrome'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
-  else if (/Version\/([\d.]+).*Safari/.test(ua)) { out.browser='Safari'; out.version=RegExp.$1; out.major=out.version.split('.')[0]; }
-  if (/Windows NT 10/.test(ua)) { out.os='Windows'; out.osVer='10'; out.platform='"Windows"'; }
-  else if (/Mac OS X/.test(ua)) { out.os='Mac OS X'; out.osVer='10.15.7'; out.platform='"macOS"'; }
-  else if (/Linux/.test(ua)) { out.os='Linux'; out.osVer=''; out.platform='"Linux"'; out.mobile='?0'; }
-  return out;
-}
+const OS_LIST = ['Windows','Mac OS X','Linux'];
+const BROWSERS = ['Chrome','Firefox','Edge','Opera','Safari'];
 
 function getDeviceSeed(token) {
   const key = 'ccvc_dev_' + stableHash(token).toString(36);
@@ -599,11 +555,14 @@ function getProfile(token) {
   if (_profileCache.has(token)) return _profileCache.get(token);
   const seed = getDeviceSeed(token);
   const h = stableHash(seed);
-  const uaStr = UA_POOL[h % UA_POOL.length];
-  const p = parseUA(uaStr);
-  const tz = TIMEZONES[(h >> 3) % TIMEZONES.length];
-  const locale = LOCALES[(h >> 5) % LOCALES.length];
-  const profile = { ...p, timezone: tz, locale };
+  const profile = {
+    os: OS_LIST[h % OS_LIST.length],
+    osVer: ['10','11','10.15.7','14.0'][(h >> 2) % 4],
+    browser: BROWSERS[(h >> 4) % BROWSERS.length],
+    version: ['131.0.0.0','130.0.0.0','129.0.0.0','17.6','133.0'][(h >> 6) % 5],
+    locale: LOCALES[(h >> 8) % LOCALES.length],
+    timezone: TIMEZONES[(h >> 10) % TIMEZONES.length]
+  };
   _profileCache.set(token, profile);
   return profile;
 }
@@ -617,7 +576,6 @@ function getSuperProps(token) {
     browser: p.browser,
     device: '',
     system_locale: p.locale,
-    browser_user_agent: p.ua,
     browser_version: p.version,
     os_version: p.osVer,
     referrer: '',
@@ -633,34 +591,30 @@ function getSuperProps(token) {
   return sp;
 }
 
+/* ============================================================
+   HEADERS — CHỈ giữ header browser cho phép set
+   Browser tự gửi: User-Agent, Origin, Referer, Sec-Fetch-*, sec-ch-*
+   ============================================================ */
 const _headerCache = new Map();
 function getHeaders(token) {
   if (_headerCache.has(token)) return _headerCache.get(token);
   const p = getProfile(token);
   const h = {
     'Authorization': token,
-    'User-Agent': p.ua,
     'Accept': '*/*',
     'Accept-Language': `${p.locale},en;q=0.9`,
-    'Accept-Encoding': 'gzip, deflate, br',
     'X-Discord-Locale': p.locale,
-    'X-Debug-Options': 'bugReporterEnabled',
-    'Origin': 'https://discord.com',
-    'Referer': 'https://discord.com/channels/@me',
-    'Sec-Fetch-Dest': 'empty',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-origin',
-    'Priority': 'u=1, i',
-    'Content-Type': 'application/json'
+    'X-Debug-Options': 'bugReporterEnabled'
   };
   if (document.getElementById('anti_super_props')?.checked) {
     h['X-Super-Properties'] = getSuperProps(token);
-    h['sec-ch-ua'] = `"${p.browser}";v="${p.major}", "Chromium";v="${p.major}", "Not_A Brand";v="24"`;
-    h['sec-ch-ua-mobile'] = p.mobile;
-    h['sec-ch-ua-platform'] = p.platform;
   }
   _headerCache.set(token, h);
   return h;
+}
+
+function getJsonHeaders(token) {
+  return { ...getHeaders(token), 'Content-Type': 'application/json' };
 }
 
 function clearFingerprintCaches() {
@@ -702,7 +656,7 @@ function getProxyFor(token) {
 /* ============================================================
    NETWORK
    ============================================================ */
-async function fetchJSON(url, opts, token, maxRetries = 2) {
+async function fetchWithRetry(url, opts, maxRetries = 2) {
   const useRetry = document.getElementById('anti_retry')?.checked;
   const tries = useRetry ? maxRetries : 1;
   let lastErr;
@@ -716,12 +670,8 @@ async function fetchJSON(url, opts, token, maxRetries = 2) {
   }
   throw lastErr;
 }
-
-async function fetchWithRetry(url, opts, maxRetries = 2) {
-  return fetchJSON(url, opts, null, maxRetries);
-}
 /* ============================================================
-   RATE-LIMIT BUCKET — dùng header thật từ Discord
+   RATE-LIMIT BUCKET
    ============================================================ */
 function updateRateBucket(token, channelId, res) {
   const useProactive = document.getElementById('anti_proactive')?.checked;
@@ -740,8 +690,7 @@ function updateRateBucket(token, channelId, res) {
 async function waitRateBucket(token, channelId) {
   const useProactive = document.getElementById('anti_proactive')?.checked;
   if (!useProactive) return;
-  // Check all buckets for this token+channel
-  for (const [bid, b] of rateBuckets.entries()) {
+  for (const [, b] of rateBuckets.entries()) {
     if (b.token === token && b.channelId === channelId) {
       if (b.remaining <= 0 && b.resetAt > Date.now()) {
         const waitMs = b.resetAt - Date.now() + rand(30, 120);
@@ -752,7 +701,7 @@ async function waitRateBucket(token, channelId) {
 }
 
 /* ============================================================
-   SEMAPHORE — không leak, không spin break
+   SEMAPHORE
    ============================================================ */
 async function acquireSlot() {
   while (activeRequests >= MAX_CONCURRENT) {
@@ -782,7 +731,7 @@ function markChannelHit(token, channelId) {
 }
 
 /* ============================================================
-   MESSAGE PICKER — reservation queue
+   MESSAGE PICKER
    ============================================================ */
 function loadMsgFile(e) {
   const f = e.target.files[0];
@@ -844,49 +793,6 @@ function showMsgStats() {
   notif('info', '📊 THỐNG KÊ', `Tổng: ${fileMsgPool.length} · Dùng: ${fileMsgUsed.size} · Còn: ${fileMsgPool.length - fileMsgUsed.size}`, 4000);
 }
 
-function buildMsgQueue(count) {
-  msgQueue = [];
-  const txt = document.getElementById('msg').value;
-  const noRepeat = document.getElementById('no_repeat')?.checked;
-  const resetWhenEmpty = document.getElementById('reset_when_empty')?.checked;
-
-  const sourcePool = fileMsgPool.length
-    ? fileMsgPool
-    : txt.split('\n').map(s => s.trim()).filter(s => s);
-
-  if (!sourcePool.length) return;
-
-  if (!noRepeat) {
-    for (let i = 0; i < count; i++) msgQueue.push(sourcePool[rand(0, sourcePool.length - 1)]);
-    return;
-  }
-
-  // no repeat: cần count câu khác nhau
-  let available = [];
-  if (fileMsgPool.length) {
-    for (let i = 0; i < sourcePool.length; i++) {
-      if (!fileMsgUsed.has(i)) available.push(i);
-    }
-    if (available.length < count && resetWhenEmpty) {
-      fileMsgUsed.clear();
-      available = Array.from({ length: sourcePool.length }, (_, i) => i);
-    }
-    available = shuffle(available);
-    const pickCount = Math.min(count, available.length);
-    for (let i = 0; i < pickCount; i++) {
-      fileMsgUsed.add(available[i]);
-      msgQueue.push(sourcePool[available[i]]);
-    }
-    // Nếu vẫn thiếu → fill random không trùng
-    while (msgQueue.length < count) {
-      msgQueue.push(sourcePool[rand(0, sourcePool.length - 1)]);
-    }
-  } else {
-    const idx = shuffle(Array.from({ length: sourcePool.length }, (_, i) => i));
-    for (let i = 0; i < count; i++) msgQueue.push(sourcePool[idx[i % sourcePool.length]]);
-  }
-}
-
 function nextMsg() {
   if (msgQueue.length) return msgQueue.pop();
   const txt = document.getElementById('msg').value;
@@ -895,7 +801,7 @@ function nextMsg() {
 }
 
 /* ============================================================
-   TYPING FAKE
+   TYPING
    ============================================================ */
 function setTyping(mode) {
   typingMode = mode;
@@ -910,8 +816,6 @@ function setTyping(mode) {
 
 async function sendTyping(token, channelId) {
   try {
-    const proxy = getProxyFor(token);
-    if (proxy) return; // proxy fetch cần native, tạm skip trong browser
     await fetch(`https://discord.com/api/v10/channels/${channelId}/typing`, {
       method: 'POST',
       headers: getHeaders(token),
@@ -935,7 +839,6 @@ async function fakeTypeDelay(token, channelId, content, mode) {
     return;
   }
 
-  // realistic
   const cps = randFloat(4, 7);
   const baseMs = (content.length / cps) * 1000;
   const jittered = baseMs * randFloat(0.8, 1.3);
@@ -972,7 +875,7 @@ function setPreset(name) {
   document.getElementById('cycle_rest').value = p.cycle_rest;
   setTyping(p.typing);
 
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.preset-btn[data-preset]').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector(`.preset-btn[data-preset="${name}"]`);
   if (btn) btn.classList.add('active');
 
@@ -986,7 +889,7 @@ function setPreset(name) {
 }
 
 function markCustom() {
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.preset-btn[data-preset]').forEach(b => b.classList.remove('active'));
   const badge = document.getElementById('preset-badge');
   badge.textContent = 'CUSTOM';
   badge.className = 'bdg bdg-warn';
@@ -998,9 +901,9 @@ function showWarningBanner(preset) {
   const hasProxy = proxyList.length > 0;
   let msg = '';
   if (preset === 'turbo') {
-    msg = '☠️ TURBO LIỀU — không proxy + turbo = chết nhanh. Token sẽ bay trong phút-giờ. Anh đã được cảnh báo.';
+    msg = '☠️ TURBO LIỀU — không proxy + turbo = chết nhanh. Token sẽ bay trong phút-giờ.';
   } else if (preset === 'aggressive' && !hasProxy) {
-    msg = '🔥 AGGRESSIVE — sống giờ-ngày nếu không proxy. Cân nhắc dùng BALANCED hoặc STEALTH.';
+    msg = '🔥 AGGRESSIVE — sống giờ-ngày nếu không proxy. Cân nhắc BALANCED hoặc STEALTH.';
   } else if (preset === 'custom') {
     const d = parseInt(document.getElementById('delay').value) || 0;
     if (d < 500 && !hasProxy) msg = '⚠️ Delay < 500ms + không proxy = rủi ro cao.';
@@ -1009,25 +912,21 @@ function showWarningBanner(preset) {
   else el.classList.remove('show');
 }
 /* ============================================================
-   FIRE ONE — gửi 1 tin
+   FIRE ONE
    ============================================================ */
 async function fireOne(token, channelId, cfg, state, short) {
   if (!isRunning || stopRequested || skippedTokens.has(token)) return;
 
-  // Channel cooldown
   if (!canHitChannel(token, channelId)) {
     skipCount++;
     return;
   }
 
-  // Proactive rate-limit wait
   await waitRateBucket(token, channelId);
 
-  // Semaphore acquire
   try { await acquireSlot(); } catch { return; }
 
   try {
-    // Build content
     let baseMsg = nextMsg();
     if (!baseMsg) { releaseSlot(); return; }
 
@@ -1045,18 +944,18 @@ async function fireOne(token, channelId, cfg, state, short) {
       content = tagAfter ? `${content} <@${tagId}>` : `<@${tagId}> ${content}`;
     }
 
-    // Fake typing
     await fakeTypeDelay(token, channelId, content, typingMode);
     if (!isRunning || stopRequested) { releaseSlot(); return; }
 
-    // Nonce
     const nonce = (BigInt(Date.now()) << 22n | BigInt(rand(0, 4194303))).toString();
-
-    const body = JSON.stringify({ content, nonce, tts: false });
 
     const res = await fetchWithRetry(
       `https://discord.com/api/v10/channels/${channelId}/messages`,
-      { method: 'POST', headers: getHeaders(token), body },
+      {
+        method: 'POST',
+        headers: getJsonHeaders(token),
+        body: JSON.stringify({ content, nonce, tts: false })
+      },
       2
     );
 
@@ -1071,7 +970,6 @@ async function fireOne(token, channelId, cfg, state, short) {
       pendingOkCount++;
       goodStreak++;
 
-      // Recover throttle chậm — 300 tin + 60s
       const now = Date.now();
       if (!goodStreakStart) goodStreakStart = now;
       if (goodStreak >= 300 && (now - goodStreakStart) >= 60000 && globalThrottleFactor < 1.0) {
@@ -1140,7 +1038,7 @@ async function fireOne(token, channelId, cfg, state, short) {
 }
 
 /* ============================================================
-   WORKER per token
+   WORKER
    ============================================================ */
 async function runTokenWorker(token, cfg) {
   const state = tokenStates.get(token);
@@ -1176,7 +1074,6 @@ async function runTokenWorker(token, cfg) {
       ? Math.max(2, Math.floor(cfg.batchSize * globalThrottleFactor))
       : cfg.batchSize;
 
-    // Round-robin qua channels với jitter
     const order = shuffle(chs);
     const jobs = [];
 
@@ -1184,7 +1081,6 @@ async function runTokenWorker(token, cfg) {
       if (globalPenaltyUntil > Date.now()) break;
       if (state.penalty > Date.now()) break;
 
-      // Tạo batch nhỏ
       const batch = order.slice(i, i + batchSize);
       i += batch.length - 1;
 
@@ -1192,7 +1088,6 @@ async function runTokenWorker(token, cfg) {
         jobs.push(fireOne(token, ch, cfg, state, short));
       }
 
-      // Delay giữa các batch
       const base = cfg.baseDelay;
       const jit = document.getElementById('anti_jitter')?.checked
         ? base * randFloat(0.85, 1.2)
@@ -1200,17 +1095,15 @@ async function runTokenWorker(token, cfg) {
       await sleep(Math.max(20, jit));
     }
 
-    // Chờ hết batch hiện tại trước khi vòng mới
     await Promise.allSettled(jobs);
 
     if (!isRunning || stopRequested) break;
-    // Vòng nghỉ nhỏ
     await sleep(rand(50, 250));
   }
 }
 
 /* ============================================================
-   THROTTLE AUTO
+   THROTTLE UI
    ============================================================ */
 function updateThrottleUI() {
   const el = document.getElementById('stat-throttle');
@@ -1222,7 +1115,7 @@ function updateThrottleUI() {
 }
 
 /* ============================================================
-   AUTO-CYCLE — chạy X phút nghỉ Y phút
+   AUTO-CYCLE
    ============================================================ */
 async function cycleManager() {
   const enabled = document.getElementById('auto_cycle')?.checked;
@@ -1336,7 +1229,7 @@ function exportLog() {
   const blob = new Blob([logsArchive.join('\n')], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `ccvc_v11_log_${Date.now()}.txt`;
+  a.download = `ccvc_v11_1_log_${Date.now()}.txt`;
   a.click();
   notif('success', '📥 EXPORT', `Đã lưu ${logsArchive.length} dòng`);
 }
@@ -1495,7 +1388,7 @@ async function checkTokens() {
       else if (r.status === 403) { locked++; writeLog(`[LOCKED] ${tks[i].slice(0, 12)}... (403)`, 'warn'); }
       else { dead++; writeLog(`[ERR] ${tks[i].slice(0, 12)}... (${r.status})`, 'error'); }
     } catch (e) { dead++; writeLog(`[NET] ${e.message}`, 'error'); }
-    await sleep(1000); // 1s/token — không đốt rate-limit
+    await sleep(1000);
   }
   setProgress(100);
   notif(alive > 0 ? 'success' : 'error', '🔍 KẾT QUẢ',
@@ -1503,7 +1396,7 @@ async function checkTokens() {
 }
 
 /* ============================================================
-   CONFIG SAVE
+   CONFIG
    ============================================================ */
 function saveConfig() {
   const fields = ['channels', 'tag_mode', 'tag_id', 'tag_pos', 'delay', 'msg', 'burst_limit',
@@ -1574,7 +1467,7 @@ async function start() {
   const turbo = delayMs <= 100;
 
   writeLog(`[START] ${turbo ? '☠️ TURBO' : 'NORMAL'} · ${delayMs}ms · batch ${batchSize} · ${tks.length} tk · ${chs.length} ch`, 'info');
-  notif('success', '🚀 V11 KHỞI ĐỘNG', `${tks.length} tk · ${chs.length} ch · ${delayMs}ms`, 3500);
+  notif('success', '🚀 V11.1 KHỞI ĐỘNG', `${tks.length} tk · ${chs.length} ch · ${delayMs}ms`, 3500);
   showToast('⚡ MÃI ĐỈNH!', 'success');
 
   const cfg = {
@@ -1688,8 +1581,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await fetchBuildNumber();
 
-  notif('success', '👑 ANH EM CCVC V11', `Sẵn sàng · ${tks.length} token · build #${buildNumber}`, 4000);
-  writeLog(`[BOOT] V11 MAI ĐỈNH · ${tks.length} token · build #${buildNumber}`, 'success');
+  notif('success', '👑 ANH EM CCVC V11.1', `Sẵn sàng · ${tks.length} token · build #${buildNumber}`, 4000);
+  writeLog(`[BOOT] V11.1 MOBILE-FIX · ${tks.length} token · build #${buildNumber}`, 'success');
   writeLog('[HINT] Ctrl+Enter: SPAM · Esc: DỪNG · Ctrl+S: Lưu · Ctrl+L: Xóa log', 'info');
 });
 </script>
